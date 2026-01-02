@@ -26,6 +26,7 @@
       --border:rgba(255,255,255,.12);
       --shadow:0 16px 40px rgba(0,0,0,.35);
       --radius:16px;
+      --lineh:1.15;
 
       font-family:
         "Deutschschweizer Basisschrift",
@@ -46,6 +47,7 @@
       padding:18px;
       box-sizing:border-box;
     }
+
     .app{width:min(1100px, 100%); display:grid; gap:14px;}
     .topbar{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -61,7 +63,9 @@
       border:1px solid var(--border);
       color:var(--muted);
       background:rgba(0,0,0,.18);
+      white-space:nowrap;
     }
+
     .card{
       border:1px solid var(--border);
       border-radius:var(--radius);
@@ -71,10 +75,9 @@
     }
     .section{padding:16px; display:grid; gap:14px;}
     .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
-    .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr);}
-    .col-6{grid-column: span 6;}
-    .col-12{grid-column: span 12;}
-    @media (max-width: 860px){ .col-6{grid-column: span 12;} }
+    .muted{color:var(--muted);}
+    .hidden{display:none !important;}
+    .divider{height:1px; background:var(--border); margin:6px 0;}
 
     .btn{
       appearance:none;
@@ -104,9 +107,8 @@
       background:linear-gradient(180deg, rgba(255,92,122,.22), rgba(255,92,122,.10));
       border-color:rgba(255,92,122,.40);
     }
-    .btn.ghost{background:transparent;}
-    .btn[disabled]{opacity:.55; cursor:not-allowed;}
     .btn.big{padding:14px 16px; font-size:18px; border-radius:16px;}
+    .btn[disabled]{opacity:.55; cursor:not-allowed;}
 
     .pill{
       display:inline-flex; align-items:center; gap:8px;
@@ -115,45 +117,32 @@
       background:rgba(0,0,0,.16);
       color:var(--muted);
       font-size:13px;
+      white-space:nowrap;
     }
 
-    /* ===== TARGET MUST FIT IN ONE LINE ===== */
-    .bigTarget{
-      font-weight:900;
-      line-height:1.2;
-      letter-spacing:.2px;
+    /* ===== Layout change: target gets full line width, single line, fit via font-size auto ===== */
+    .lineBox{
+      width:100%;
+      box-sizing:border-box;
       padding:14px 16px;
       border-radius:16px;
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
-      font-family: inherit;
-
-      white-space:nowrap;          /* one line */
-      overflow:hidden;             /* no wrap */
-      text-overflow:ellipsis;      /* safety if too long */
-      width:100%;
-      box-sizing:border-box;
-      font-size: clamp(20px, 4.2vw, 54px);
-    }
-
-    /* Spoken appears only after finished reading */
-    .spokenNormBig{
       font-weight:900;
-      line-height:1.2;
       letter-spacing:.2px;
-      padding:14px 16px;
-      border-radius:16px;
-      border:1px dashed rgba(122,162,255,.55);
-      background:rgba(122,162,255,.08);
-      font-family: inherit;
-      color: var(--accent);
-
+      line-height:var(--lineh);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      width:100%;
-      box-sizing:border-box;
-      font-size: clamp(20px, 4.2vw, 54px);
+    }
+    .targetLine{
+      font-size:56px; /* will be auto-fitted down to min */
+    }
+    .spokenLine{
+      border:1px dashed rgba(122,162,255,.55);
+      background:rgba(122,162,255,.08);
+      color:var(--accent);
+      font-size:56px; /* will be fitted to match target size */
     }
 
     .feedback{
@@ -167,10 +156,6 @@
     }
     .feedback.ok{border-color:rgba(57,217,138,.45); background:rgba(57,217,138,.12); color:#dfffea;}
     .feedback.bad{border-color:rgba(255,92,122,.45); background:rgba(255,92,122,.10); color:#ffe2e8;}
-    .hidden{display:none !important;}
-    .divider{height:1px; background:var(--border); margin:6px 0;}
-    .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
-    .muted{color:var(--muted);}
 
     /* Info button + overlay */
     .infoBtn{
@@ -229,6 +214,20 @@
       border-color:rgba(122,162,255,.65) !important;
       background:linear-gradient(180deg, rgba(122,162,255,.32), rgba(122,162,255,.16)) !important;
     }
+
+    input[type="text"]{
+      width:100%;
+      box-sizing:border-box;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.20);
+      color:var(--text);
+      font-family:inherit;
+      font-weight:900;
+      font-size:18px;
+      outline:none;
+    }
   </style>
 </head>
 <body>
@@ -272,7 +271,9 @@
           <button id="btnStart" class="btn primary big">Start</button>
         </div>
 
-        <div class="footerNote">🎤 Sprechen → laut lesen. Das Überprüfen passiert automatisch.</div>
+        <div class="muted" style="font-size:12px; line-height:1.35;">
+          Ablauf: Button <b>🎤 Sprechen</b> starten → laut lesen → nach kurzer Stille wird automatisch geprüft.
+        </div>
       </div>
     </div>
 
@@ -284,29 +285,25 @@
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
         </div>
 
-        <!-- Target: always single line -->
-        <div id="targetBox" class="bigTarget">…</div>
+        <!-- target gets the whole line -->
+        <div id="targetLine" class="lineBox targetLine">…</div>
 
-        <!-- Spoken: hidden until end-of-utterance -->
-        <div id="spokenNormBig" class="spokenNormBig hidden"></div>
+        <!-- spoken appears only after finished -->
+        <div id="spokenLine" class="lineBox spokenLine hidden"></div>
 
         <div class="row">
           <button id="btnMic" class="btn ok big">🎤 Sprechen</button>
         </div>
 
-        <div id="fallbackWrap" class="grid hidden">
-          <div class="col-12">
-            <div class="feedback bad">Spracherkennung ist nicht verfügbar. Bitte Text eingeben und „OK“ drücken.</div>
-          </div>
-          <div class="col-12">
-            <input id="fallbackInput" type="text" placeholder="Gelesenen Text eingeben…" />
-          </div>
-          <div class="col-12">
-            <button id="btnFallbackOk" class="btn primary big" type="button">OK</button>
-          </div>
+        <div id="fallbackWrap" class="hidden">
+          <div class="feedback bad">Spracherkennung ist nicht verfügbar. Bitte Text eingeben und „OK“ drücken.</div>
+          <div style="height:10px"></div>
+          <input id="fallbackInput" type="text" placeholder="Gelesenen Text eingeben…" />
+          <div style="height:10px"></div>
+          <button id="btnFallbackOk" class="btn primary big" type="button">OK</button>
         </div>
 
-        <div class="col-12">
+        <div>
           <div id="feedback" class="feedback">Bereit.</div>
         </div>
       </div>
@@ -327,7 +324,7 @@
 
         <div class="row">
           <button id="btnDone" class="btn primary big">Fertig</button>
-          <button id="btnPractice" class="btn ghost big">Weiter üben</button>
+          <button id="btnPractice" class="btn big" type="button">Weiter üben</button>
         </div>
       </div>
     </div>
@@ -343,51 +340,34 @@
           <button id="btnCloseInfo" class="closeBtn" type="button">Schliessen</button>
         </div>
 
-        <div class="grid">
-          <div class="col-6">
-            <label for="orderSel">Reihenfolge</label>
-            <select id="orderSel">
+        <div class="row" style="gap:12px; flex-wrap:wrap;">
+          <div style="flex:1 1 220px;">
+            <div class="muted" style="font-weight:900; margin-bottom:6px;">Reihenfolge</div>
+            <select id="orderSel" style="width:100%; padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.20); color:var(--text); font-family:inherit; font-weight:900;">
               <option value="random">Zufällig</option>
               <option value="inorder">In Reihenfolge</option>
             </select>
           </div>
 
-          <div class="col-6">
-            <label>Audio</label>
-            <div class="footerNote">
-              Fix: <b>/audio/correct.wav</b>, <b>/audio/error.wav</b>, <b>/audio/gamewon.wav</b>
-            </div>
-          </div>
-
-          <div class="col-6">
-            <label>Vergleich</label>
-            <label class="pill" style="cursor:pointer; width:fit-content;">
-              <input id="removeFillers" type="checkbox" checked style="transform:translateY(1px);" />
-              Füllwörter entfernen
+          <div style="flex:1 1 220px;">
+            <div class="muted" style="font-weight:900; margin-bottom:6px;">Optionen</div>
+            <label style="display:flex; gap:10px; align-items:center; padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.18);">
+              <input id="removeFillers" type="checkbox" checked />
+              <span style="font-weight:900;">Füllwörter entfernen</span>
             </label>
-          </div>
-
-          <div class="col-6">
-            <label>Fehler-Text</label>
-            <label class="pill" style="cursor:pointer; width:fit-content;">
+            <div style="height:10px"></div>
+            <label style="display:flex; gap:10px; align-items:center; padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.18);">
               <input id="showExpectedOnFail" type="checkbox" />
-              Bei Fehler „Richtig wäre …“ anzeigen
+              <span style="font-weight:900;">Bei Fehler „Richtig wäre …“</span>
             </label>
           </div>
+        </div>
 
-          <div class="col-12">
-            <div class="divider"></div>
-            <div class="footerNote">
-              Spracherkennung: <b>de-CH</b>. Normalisierung: deterministisch <b>ß → ss</b>.
-              Automatische Prüfung: Ende der Äusserung (kurze Stille) → Anzeige des gesprochenen Texts → Bewertung.
-            </div>
-            <div class="footerNote">
-              LearningView Abschluss: <b>window.parent.postMessage("AppSolved","*")</b>
-            </div>
-            <div class="footerNote">
-              SpeechRecognition: <b id="srAvail">—</b>
-            </div>
-          </div>
+        <div class="divider"></div>
+        <div class="muted" style="font-size:12px; line-height:1.35;">
+          Audio: <b>/audio/correct.wav</b>, <b>/audio/error.wav</b>, <b>/audio/gamewon.wav</b><br>
+          Spracherkennung: <b>de-CH</b> • Normalisierung: <b>ß → ss</b> • Anzeige: Zieltext exakt wie in den Listen (Gross-/Kleinschreibung bleibt).
+          <br>SpeechRecognition: <b id="srAvail">—</b>
         </div>
       </div>
     </div>
@@ -401,16 +381,14 @@
     const SR_LANG = "de-CH";
     const TASKS_TOTAL = 20;
     const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
-
     const AUDIO_OK_URL  = "/audio/correct.wav";
     const AUDIO_BAD_URL = "/audio/error.wav";
     const AUDIO_WON_URL = "/audio/gamewon.wav";
-
-    const SILENCE_MS = 900;          // auto-stop after short silence (if at least 1 final chunk)
-    const NEXT_DELAY_MS = 450;       // small delay before next item
+    const SILENCE_MS = 900;
+    const NEXT_DELAY_MS = 450;
 
     // =========================
-    // WORD LISTS (as provided)
+    // Lists (case preserved for display!)
     // =========================
     const WORDS_LVL1 = [
       "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
@@ -440,9 +418,6 @@
       "Freundschaftsbündnis","Angstmoment","Erleichterungsseufzer","Abschlusslachen","Heimwegentscheidung"
     ];
 
-    // =========================
-    // SENTENCE LISTS
-    // =========================
     const SENT_LVL1 = [
       "Mama isst Brot.","Papa fährt Auto.","Die Maus rennt.","Der Bus kommt.","Das Haus ist gross.","Die Sonne scheint.","Ich sehe Meer.","Der Vogel fliegt.","Das Boot schwimmt.","Ich mag Eis.",
       "Oma sitzt da.","Opa liest Buch.","Die Uhr tickt.","Das Bett ist weich.","Der Mond leuchtet.","Die Katze rennt.","Der Hund bellt.","Ich höre Radio.","Das Brot ist warm.","Die Suppe dampft.",
@@ -476,19 +451,15 @@
 
     const btnModeWords = el("btnModeWords");
     const btnModeSent = el("btnModeSent");
-
     const btnLvlEasy = el("btnLvlEasy");
     const btnLvlMed  = el("btnLvlMed");
     const btnLvlHard = el("btnLvlHard");
-
     const btnStart = el("btnStart");
 
     const progressText = el("progressText");
-    const targetBox = el("targetBox");
-    const spokenNormBig = el("spokenNormBig");
-
+    const targetLine = el("targetLine");
+    const spokenLine = el("spokenLine");
     const btnMic = el("btnMic");
-
     const feedback = el("feedback");
     const rightCount = el("rightCount");
     const wrongCount = el("wrongCount");
@@ -508,7 +479,6 @@
     const overlay = el("overlay");
     const btnInfo = el("btnInfo");
     const btnCloseInfo = el("btnCloseInfo");
-
     const orderSel = el("orderSel");
     const removeFillers = el("removeFillers");
     const showExpectedOnFail = el("showExpectedOnFail");
@@ -518,7 +488,6 @@
     // =========================
     let uiMode = "words";
     let uiLevel = "easy";
-
     function setMode(mode){
       uiMode = mode;
       btnModeWords.classList.toggle("selected", mode === "words");
@@ -530,7 +499,6 @@
       btnLvlMed.classList.toggle("selected", level === "med");
       btnLvlHard.classList.toggle("selected", level === "hard");
     }
-
     setMode("words");
     setLevel("easy");
 
@@ -541,7 +509,17 @@
     btnLvlHard.addEventListener("click", ()=>setLevel("hard"));
 
     // =========================
-    // Audio
+    // Teacher drawer
+    // =========================
+    function openInfo(){ overlay.classList.add("open"); }
+    function closeInfo(){ overlay.classList.remove("open"); }
+    btnInfo.addEventListener("click", openInfo);
+    btnCloseInfo.addEventListener("click", closeInfo);
+    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
+    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
+
+    // =========================
+    // Audio (only after interaction)
     // =========================
     let audioOk = null, audioBad = null, audioWon = null;
     function initAudio(){
@@ -562,40 +540,34 @@
     // =========================
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const hasSR = !!SR;
-
     srBadge.textContent = hasSR ? "🎙️ bereit" : "🎙️ nicht verfügbar";
     srAvail.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
 
     let recognition = null;
     let isListening = false;
 
-    // buffer: final chunks only
-    let speechBuffer = "";
+    // buffer strategy
+    let speechBuffer = "";   // finals only
     let finalChunks = [];
     let hadFinalChunk = false;
     let silenceTimer = null;
 
     function clearSilenceTimer(){
-      if(silenceTimer){
-        clearTimeout(silenceTimer);
-        silenceTimer = null;
-      }
+      if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
     }
     function restartSilenceTimer(){
-      if(!hasSR) return;
       clearSilenceTimer();
       silenceTimer = setTimeout(()=>{
-        // auto-stop only if at least one final chunk exists
+        // auto-stop ONLY if we already have something final
         if(isListening && hadFinalChunk){
-          stopListening();
-          onUtteranceFinished(); // automatic check here
+          stopListening(false);
+          onUtteranceFinished();
         }
       }, SILENCE_MS);
     }
 
     function setupRecognition(){
       if(!hasSR) return;
-
       recognition = new SR();
       recognition.lang = SR_LANG;
       recognition.continuous = true;
@@ -603,32 +575,27 @@
       recognition.maxAlternatives = 8;
 
       recognition.onresult = (event)=>{
-        let interimText = "";
         for(let i = event.resultIndex; i < event.results.length; i++){
           const res = event.results[i];
           const transcript = (res && res[0] ? res[0].transcript : "").trim();
           if(!transcript) continue;
-
           if(res.isFinal){
             const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
             if(transcript !== last){
               finalChunks.push(transcript);
-              if(finalChunks.length > 60) finalChunks = finalChunks.slice(-60);
+              if(finalChunks.length > 80) finalChunks = finalChunks.slice(-80);
               if(speechBuffer) speechBuffer += " ";
               speechBuffer += transcript;
               hadFinalChunk = true;
             }
-          }else{
-            interimText = transcript;
           }
         }
-        // don't show spoken text while speaking
         restartSilenceTimer();
       };
 
       recognition.onerror = ()=>{
         setFeedback("Fehler bei der Spracherkennung.", "bad");
-        stopListening();
+        stopListening(true);
       };
 
       recognition.onend = ()=>{
@@ -641,14 +608,14 @@
     function startListening(){
       if(!hasSR || !recognition) return;
 
-      // reset buffers for attempt (repeat allowed)
+      // Reset attempt buffers
       speechBuffer = "";
       finalChunks = [];
       hadFinalChunk = false;
 
-      // hide spoken until finished
-      spokenNormBig.textContent = "";
-      spokenNormBig.classList.add("hidden");
+      // Hide spoken text until finished
+      spokenLine.textContent = "";
+      spokenLine.classList.add("hidden");
 
       recognition.lang = SR_LANG;
 
@@ -665,20 +632,16 @@
       }
     }
 
-    function stopListening(){
+    function stopListening(isError){
       if(!hasSR || !recognition) return;
       try{ recognition.stop(); }catch(_){}
       isListening = false;
       updateMicButton();
       clearSilenceTimer();
-    }
-
-    function toggleListening(){
-      if(!hasSR) return;
-      if(!recognition) setupRecognition();
-      if(!audioOk || !audioBad || !audioWon) initAudio(); // user interaction
-      if(isListening) stopListening();
-      else startListening();
+      if(isError){
+        spokenLine.textContent = "";
+        spokenLine.classList.add("hidden");
+      }
     }
 
     function updateMicButton(){
@@ -689,7 +652,7 @@
     }
 
     // =========================
-    // Normalization & Matching
+    // Matching (case-insensitive)
     // =========================
     function normalizeText(s, opts){
       const remove = !!(opts && opts.removeFillers);
@@ -726,9 +689,7 @@
     function compareDeterministic(targetText, spokenTextRaw, mode){
       const tNorm = normalizeText(targetText, {removeFillers: removeFillers.checked});
       const sNorm = normalizeText(spokenTextRaw, {removeFillers: removeFillers.checked});
-
-      if(!tNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
-      if(!sNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
+      if(!tNorm || !sNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
 
       if(mode === "words"){
         const tTokens = tokenize(tNorm);
@@ -744,6 +705,32 @@
 
       return {ok: isSubsequenceMatch(tokenize(tNorm), tokenize(sNorm), 0.90), spokenNorm:sNorm, targetNorm:tNorm};
     }
+
+    // =========================
+    // Fit text so it stays on one line (no ellipsis in normal cases)
+    // We keep nowrap and reduce font-size until it fits.
+    // =========================
+    function fitOneLine(boxEl, maxPx, minPx){
+      boxEl.style.fontSize = maxPx + "px";
+      // force reflow
+      let tries = 0;
+      while(tries < 40 && boxEl.scrollWidth > boxEl.clientWidth && maxPx > minPx){
+        maxPx -= 2;
+        boxEl.style.fontSize = maxPx + "px";
+        tries++;
+      }
+      return maxPx;
+    }
+    function fitTargetAndSpoken(targetText){
+      targetLine.textContent = targetText;
+      const size = fitOneLine(targetLine, 56, 18);
+      spokenLine.style.fontSize = size + "px";
+    }
+    window.addEventListener("resize", ()=>{
+      if(run && run.lastTarget){
+        fitTargetAndSpoken(run.lastTarget);
+      }
+    });
 
     // =========================
     // Run state
@@ -768,33 +755,22 @@
       }
       return arr;
     }
-
-    function startRun(){
-      const pool = buildPool();
-      const items = pool.slice();
-      if(orderSel.value === "random") shuffleInPlace(items);
-
-      run = {
-        mode: uiMode,
-        items,
-        index: 0,
-        right: 0,
-        wrong: 0,
-        lastTarget: ""
-      };
-
-      if(hasSR && !recognition) setupRecognition();
-      if(!audioOk || !audioBad || !audioWon) initAudio();
-
-      goQuiz();
-      loadTask();
+    function updateCounts(){
+      rightCount.textContent = String(run ? run.right : 0);
+      wrongCount.textContent = String(run ? run.wrong : 0);
+    }
+    function setFeedback(text, kind){
+      feedback.textContent = text;
+      feedback.classList.remove("ok","bad");
+      if(kind === "ok") feedback.classList.add("ok");
+      if(kind === "bad") feedback.classList.add("bad");
     }
 
     function goStart(){
       screenStart.classList.remove("hidden");
       screenQuiz.classList.add("hidden");
       screenResult.classList.add("hidden");
-      if(isListening) stopListening();
+      if(isListening) stopListening(true);
     }
     function goQuiz(){
       screenStart.classList.add("hidden");
@@ -805,26 +781,10 @@
       screenStart.classList.add("hidden");
       screenQuiz.classList.add("hidden");
       screenResult.classList.remove("hidden");
-      if(isListening) stopListening();
-
+      if(isListening) stopListening(true);
       resRight.textContent = String(run ? run.right : 0);
       resWrong.textContent = String(run ? run.wrong : 0);
-
-      if(run && run.right === TASKS_TOTAL && run.wrong === 0){
-        playWon();
-      }
-    }
-
-    function setFeedback(text, kind){
-      feedback.textContent = text;
-      feedback.classList.remove("ok","bad");
-      if(kind === "ok") feedback.classList.add("ok");
-      if(kind === "bad") feedback.classList.add("bad");
-    }
-
-    function updateCounts(){
-      rightCount.textContent = String(run ? run.right : 0);
-      wrongCount.textContent = String(run ? run.wrong : 0);
+      if(run && run.right === TASKS_TOTAL && run.wrong === 0) playWon();
     }
 
     function loadTask(){
@@ -833,15 +793,16 @@
         goResult();
         return;
       }
-
       run.lastTarget = run.items[run.index];
 
       progressText.textContent = `Aufgabe ${run.index + 1} von ${TASKS_TOTAL}`;
-      targetBox.textContent = run.lastTarget;
 
-      // hide spoken display until finish
-      spokenNormBig.textContent = "";
-      spokenNormBig.classList.add("hidden");
+      // show target (case preserved) + fit to one line
+      fitTargetAndSpoken(run.lastTarget);
+
+      // hide spoken line until finished
+      spokenLine.textContent = "";
+      spokenLine.classList.add("hidden");
 
       setFeedback("Bereit.", "");
       updateCounts();
@@ -854,26 +815,37 @@
       }
     }
 
-    function getSpokenRawForAutoCheck(){
-      if(!hasSR) return (fallbackInput.value || "").trim();
-      return (speechBuffer || "").trim(); // finals only
+    function startRun(){
+      const pool = buildPool();
+      const items = pool.slice();
+      if(orderSel.value === "random") shuffleInPlace(items);
+
+      run = { mode: uiMode, items, index: 0, right: 0, wrong: 0, lastTarget: "" };
+
+      if(hasSR && !recognition) setupRecognition();
+      goQuiz();
+      loadTask();
+      updateMicButton();
     }
 
     function onUtteranceFinished(){
-      // reveal spoken normalized text now
-      const spokenRaw = getSpokenRawForAutoCheck();
+      if(!run) return;
+
+      const spokenRaw = (hasSR ? (speechBuffer || "").trim() : (fallbackInput.value || "").trim());
       const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
 
-      spokenNormBig.textContent = cmp.spokenNorm || "";
-      spokenNormBig.classList.remove("hidden");
+      // show normalized spoken after finished
+      spokenLine.textContent = cmp.spokenNorm || "";
+      spokenLine.classList.remove("hidden");
+
+      // fit spoken to same size as target (already set)
+      // (spokenLine font-size is synced in fitTargetAndSpoken)
 
       if(cmp.ok){
         run.right++;
         setFeedback("Richtig ✅", "ok");
         playOk();
         updateCounts();
-
-        // next after short delay
         setTimeout(()=>{
           run.index++;
           loadTask();
@@ -884,24 +856,9 @@
         setFeedback("Falsch ❌" + extra, "bad");
         playBad();
         updateCounts();
-        // allow repeat: user presses mic again
+        // repeat allowed: user presses mic again
       }
     }
-
-    function doDone(){
-      try{ window.parent.postMessage("AppSolved","*"); }catch(_){}
-    }
-
-    // =========================
-    // Teacher drawer
-    // =========================
-    function openInfo(){ overlay.classList.add("open"); }
-    function closeInfo(){ overlay.classList.remove("open"); }
-
-    btnInfo.addEventListener("click", openInfo);
-    btnCloseInfo.addEventListener("click", closeInfo);
-    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
-    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
 
     // =========================
     // Buttons
@@ -909,77 +866,109 @@
     btnStart.addEventListener("click", startRun);
 
     btnMic.addEventListener("click", ()=>{
+      if(!audioOk || !audioBad || !audioWon) initAudio(); // user interaction unlocks audio
+
       if(!hasSR){
         setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
+        fallbackWrap.classList.remove("hidden");
         return;
       }
-      toggleListening();
+      if(!recognition) setupRecognition();
+
+      if(isListening){
+        // manual stop -> auto-check if anything was captured
+        stopListening(false);
+        setTimeout(()=>{
+          if(hadFinalChunk){
+            onUtteranceFinished();
+          }else{
+            setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
+            playBad();
+            spokenLine.textContent = "";
+            spokenLine.classList.add("hidden");
+          }
+        }, 80);
+      }else{
+        // START recording ONLY on button click (as requested)
+        startListening();
+      }
     });
 
     btnFallbackOk.addEventListener("click", ()=>{
-      if(!audioOk || !audioBad || !audioWon) initAudio(); // interaction
+      if(!audioOk || !audioBad || !audioWon) initAudio();
       if(!run) return;
-      // manual "finished" in fallback
-      spokenNormBig.textContent = normalizeText(getSpokenRawForAutoCheck(), {removeFillers: removeFillers.checked});
-      spokenNormBig.classList.remove("hidden");
       onUtteranceFinished();
     });
 
-    btnDone.addEventListener("click", doDone);
-    btnPractice.addEventListener("click", ()=>{
-      run = null;
-      goStart();
-    });
+    btnDone.addEventListener("click", ()=>{ try{ window.parent.postMessage("AppSolved","*"); }catch(_){} });
+    btnPractice.addEventListener("click", ()=>{ run = null; goStart(); });
 
     // =========================
-    // SR end handling:
-    // If recognition ends (manual stop) and we have final chunk, auto-check.
+    // Start selections
     // =========================
-    function tryAutoCheckOnManualStop(){
-      if(!run) return;
-      if(hadFinalChunk){
-        onUtteranceFinished();
-      }else{
-        setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
-        playBad();
-        // keep spoken hidden
-        spokenNormBig.textContent = "";
-        spokenNormBig.classList.add("hidden");
-      }
-    }
+    // Mode + level buttons already wired above
 
-    // Patch manual stop to trigger auto-check if finals exist
-    const originalToggle = toggleListening;
-    function toggleListeningPatched(){
-      if(!hasSR) return;
-      if(!recognition) setupRecognition();
-      if(!audioOk || !audioBad || !audioWon) initAudio();
-
-      if(isListening){
-        stopListening();
-        setTimeout(tryAutoCheckOnManualStop, 80);
-      }else{
-        startListening();
-      }
-    }
-    // replace handler
-    btnMic.removeEventListener("click", ()=>{});
-    btnMic.addEventListener("click", ()=>{
-      if(!hasSR){
-        setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
-        return;
-      }
-      toggleListeningPatched();
-    });
-
+    // =========================
     // Init
+    // =========================
     if(hasSR){
-      if(!recognition) setupRecognition();
+      setupRecognition();
     }else{
       fallbackWrap.classList.remove("hidden");
     }
     goStart();
     updateMicButton();
+
+    function updateMicButton(){
+      btnMic.textContent = isListening ? "⏹️ Stop" : "🎤 Sprechen";
+      btnMic.classList.toggle("bad", isListening);
+      btnMic.classList.toggle("ok", !isListening);
+      srBadge.textContent = hasSR ? (isListening ? "🎙️ hört zu…" : "🎙️ bereit") : "🎙️ nicht verfügbar";
+    }
+
+    // redefine startListening with local state update after updateMicButton is defined
+    const _startListening = startListening;
+    function startListening(){
+      if(!hasSR || !recognition) return;
+
+      speechBuffer = "";
+      finalChunks = [];
+      hadFinalChunk = false;
+
+      spokenLine.textContent = "";
+      spokenLine.classList.add("hidden");
+
+      recognition.lang = SR_LANG;
+
+      try{
+        recognition.start();
+        isListening = true;
+        updateMicButton();
+        setFeedback("Sprich jetzt.", "");
+        restartSilenceTimer();
+      }catch(_){
+        setFeedback("Spracherkennung konnte nicht gestartet werden.", "bad");
+        isListening = false;
+        updateMicButton();
+      }
+    }
+
+    // patch stopListening to update button
+    const _stopListening = stopListening;
+    function stopListening(isError){
+      if(!hasSR || !recognition) return;
+      try{ recognition.stop(); }catch(_){}
+      isListening = false;
+      updateMicButton();
+      clearSilenceTimer();
+      if(isError){
+        spokenLine.textContent = "";
+        spokenLine.classList.add("hidden");
+      }
+    }
+
+    // Expose patched functions to the closures used above by reassigning
+    // (JS function hoisting allows this safely in this IIFE)
   })();
   </script>
 </body>
