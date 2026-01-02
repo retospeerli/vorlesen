@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vorlese-App – Lesefluss (Frontend)</title>
+  <title>Vorlese-App – Lesefluss</title>
 
   <style>
     @font-face{
@@ -26,11 +26,9 @@
       --border:rgba(255,255,255,.12);
       --shadow:0 16px 40px rgba(0,0,0,.35);
       --radius:16px;
-      --lineh:1.15;
 
-      font-family:
-        "Deutschschweizer Basisschrift",
-        system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      font-family:"Deutschschweizer Basisschrift",
+        system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     }
 
     html,body{height:100%;}
@@ -48,9 +46,9 @@
       box-sizing:border-box;
     }
 
-    .app{width:min(1100px, 100%); display:grid; gap:14px;}
+    .app{width:min(1200px,100%); display:grid; gap:14px;}
     .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:12px 14px;
       border:1px solid var(--border);
       border-radius:var(--radius);
@@ -59,13 +57,12 @@
     }
     .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px;}
     .badge{
-      font-size:12px; padding:3px 8px; border-radius:999px;
+      font-size:12px; padding:4px 10px; border-radius:999px;
       border:1px solid var(--border);
       color:var(--muted);
       background:rgba(0,0,0,.18);
       white-space:nowrap;
     }
-
     .card{
       border:1px solid var(--border);
       border-radius:var(--radius);
@@ -75,6 +72,15 @@
     }
     .section{padding:16px; display:grid; gap:14px;}
     .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.16);
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+    }
     .muted{color:var(--muted);}
     .hidden{display:none !important;}
     .divider{height:1px; background:var(--border); margin:6px 0;}
@@ -90,9 +96,9 @@
       font-weight:900;
       letter-spacing:.2px;
       user-select:none;
-      transition:transform .04s ease, background .12s ease, border-color .12s ease;
-      font-family: inherit;
+      font-family:inherit;
       font-size:16px;
+      transition:transform .04s ease, background .12s ease, border-color .12s ease;
     }
     .btn:active{transform:translateY(1px);}
     .btn.primary{
@@ -110,39 +116,26 @@
     .btn.big{padding:14px 16px; font-size:18px; border-radius:16px;}
     .btn[disabled]{opacity:.55; cursor:not-allowed;}
 
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px; border-radius:999px;
-      border:1px solid var(--border);
-      background:rgba(0,0,0,.16);
-      color:var(--muted);
-      font-size:13px;
-      white-space:nowrap;
-    }
-
-    /* ===== Layout change: target gets full line width, single line, fit via font-size auto ===== */
+    /* TARGET gets full width line */
     .lineBox{
       width:100%;
       box-sizing:border-box;
-      padding:14px 16px;
-      border-radius:16px;
+      padding:16px 18px;
+      border-radius:18px;
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
       font-weight:900;
       letter-spacing:.2px;
-      line-height:var(--lineh);
+      line-height:1.12;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-    }
-    .targetLine{
-      font-size:56px; /* will be auto-fitted down to min */
+      font-size:56px; /* auto-fitted down */
     }
     .spokenLine{
       border:1px dashed rgba(122,162,255,.55);
       background:rgba(122,162,255,.08);
       color:var(--accent);
-      font-size:56px; /* will be fitted to match target size */
     }
 
     .feedback{
@@ -230,6 +223,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="app">
     <div class="topbar">
@@ -272,7 +266,7 @@
         </div>
 
         <div class="muted" style="font-size:12px; line-height:1.35;">
-          Ablauf: Button <b>🎤 Sprechen</b> starten → laut lesen → nach kurzer Stille wird automatisch geprüft.
+          Ablauf: <b>Sprechen</b> drücken → laut lesen → bei kurzer Stille wird automatisch geprüft.
         </div>
       </div>
     </div>
@@ -285,10 +279,7 @@
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
         </div>
 
-        <!-- target gets the whole line -->
-        <div id="targetLine" class="lineBox targetLine">…</div>
-
-        <!-- spoken appears only after finished -->
+        <div id="targetLine" class="lineBox">…</div>
         <div id="spokenLine" class="lineBox spokenLine hidden"></div>
 
         <div class="row">
@@ -366,30 +357,29 @@
         <div class="divider"></div>
         <div class="muted" style="font-size:12px; line-height:1.35;">
           Audio: <b>/audio/correct.wav</b>, <b>/audio/error.wav</b>, <b>/audio/gamewon.wav</b><br>
-          Spracherkennung: <b>de-CH</b> • Normalisierung: <b>ß → ss</b> • Anzeige: Zieltext exakt wie in den Listen (Gross-/Kleinschreibung bleibt).
+          Spracherkennung: <b>de-CH</b> • Normalisierung: <b>ß → ss</b> • Zieltext bleibt exakt wie in den Listen (Gross-/Kleinschreibung).
           <br>SpeechRecognition: <b id="srAvail">—</b>
         </div>
       </div>
     </div>
-
   </div>
 
   <script>
   (function(){
     "use strict";
 
+    // ===== Constants =====
     const SR_LANG = "de-CH";
     const TASKS_TOTAL = 20;
-    const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
+    const SILENCE_MS = 900;
+
     const AUDIO_OK_URL  = "/audio/correct.wav";
     const AUDIO_BAD_URL = "/audio/error.wav";
     const AUDIO_WON_URL = "/audio/gamewon.wav";
-    const SILENCE_MS = 900;
-    const NEXT_DELAY_MS = 450;
 
-    // =========================
-    // Lists (case preserved for display!)
-    // =========================
+    const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
+
+    // ===== Lists (case preserved for display!) =====
     const WORDS_LVL1 = [
       "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
       "Weg","Baum","Mond","Sonne","Stern","Brot","Apfel","Suppe","Ball","Boot",
@@ -440,229 +430,141 @@
       "Der Plan änderte sich, weil etwas fehlte.","Wir warteten draussen, bis es dunkel wurde.","Ich flüsterte, damit niemand uns hörte.","Sie rannten weiter, obwohl sie müde waren.","Der Ball tauchte wieder auf, als niemand rechnete.","Wir gingen langsam, weil der Boden nass war.","Ich nickte, obwohl ich zweifelte.","Sie schauten weg, als es peinlich wurde.","Wir blieben stehen, bis alles ruhig war.","Dann gingen wir weiter, als wäre nichts gewesen."
     ];
 
-    // =========================
-    // DOM
-    // =========================
-    const el = (id)=>document.getElementById(id);
+    // ===== DOM =====
+    const $ = (id)=>document.getElementById(id);
 
-    const screenStart = el("screenStart");
-    const screenQuiz = el("screenQuiz");
-    const screenResult = el("screenResult");
+    const screenStart = $("screenStart");
+    const screenQuiz = $("screenQuiz");
+    const screenResult = $("screenResult");
 
-    const btnModeWords = el("btnModeWords");
-    const btnModeSent = el("btnModeSent");
-    const btnLvlEasy = el("btnLvlEasy");
-    const btnLvlMed  = el("btnLvlMed");
-    const btnLvlHard = el("btnLvlHard");
-    const btnStart = el("btnStart");
+    const btnModeWords = $("btnModeWords");
+    const btnModeSent = $("btnModeSent");
+    const btnLvlEasy = $("btnLvlEasy");
+    const btnLvlMed = $("btnLvlMed");
+    const btnLvlHard = $("btnLvlHard");
+    const btnStart = $("btnStart");
 
-    const progressText = el("progressText");
-    const targetLine = el("targetLine");
-    const spokenLine = el("spokenLine");
-    const btnMic = el("btnMic");
-    const feedback = el("feedback");
-    const rightCount = el("rightCount");
-    const wrongCount = el("wrongCount");
+    const progressText = $("progressText");
+    const targetLine = $("targetLine");
+    const spokenLine = $("spokenLine");
+    const btnMic = $("btnMic");
 
-    const fallbackWrap = el("fallbackWrap");
-    const fallbackInput = el("fallbackInput");
-    const btnFallbackOk = el("btnFallbackOk");
+    const feedback = $("feedback");
+    const rightCount = $("rightCount");
+    const wrongCount = $("wrongCount");
 
-    const resRight = el("resRight");
-    const resWrong = el("resWrong");
-    const btnDone = el("btnDone");
-    const btnPractice = el("btnPractice");
+    const fallbackWrap = $("fallbackWrap");
+    const fallbackInput = $("fallbackInput");
+    const btnFallbackOk = $("btnFallbackOk");
 
-    const srBadge = el("srBadge");
-    const srAvail = el("srAvail");
+    const resRight = $("resRight");
+    const resWrong = $("resWrong");
+    const btnDone = $("btnDone");
+    const btnPractice = $("btnPractice");
 
-    const overlay = el("overlay");
-    const btnInfo = el("btnInfo");
-    const btnCloseInfo = el("btnCloseInfo");
-    const orderSel = el("orderSel");
-    const removeFillers = el("removeFillers");
-    const showExpectedOnFail = el("showExpectedOnFail");
+    const srBadge = $("srBadge");
+    const srAvail = $("srAvail");
 
-    // =========================
-    // Student UI state
-    // =========================
+    const overlay = $("overlay");
+    const btnInfo = $("btnInfo");
+    const btnCloseInfo = $("btnCloseInfo");
+    const orderSel = $("orderSel");
+    const removeFillers = $("removeFillers");
+    const showExpectedOnFail = $("showExpectedOnFail");
+
+    // ===== Student menu state =====
     let uiMode = "words";
     let uiLevel = "easy";
-    function setMode(mode){
-      uiMode = mode;
-      btnModeWords.classList.toggle("selected", mode === "words");
-      btnModeSent.classList.toggle("selected", mode === "sentences");
+    function setMode(m){
+      uiMode = m;
+      btnModeWords.classList.toggle("selected", m==="words");
+      btnModeSent.classList.toggle("selected", m==="sentences");
     }
-    function setLevel(level){
-      uiLevel = level;
-      btnLvlEasy.classList.toggle("selected", level === "easy");
-      btnLvlMed.classList.toggle("selected", level === "med");
-      btnLvlHard.classList.toggle("selected", level === "hard");
+    function setLevel(l){
+      uiLevel = l;
+      btnLvlEasy.classList.toggle("selected", l==="easy");
+      btnLvlMed.classList.toggle("selected", l==="med");
+      btnLvlHard.classList.toggle("selected", l==="hard");
     }
     setMode("words");
     setLevel("easy");
+    btnModeWords.onclick = ()=>setMode("words");
+    btnModeSent.onclick = ()=>setMode("sentences");
+    btnLvlEasy.onclick = ()=>setLevel("easy");
+    btnLvlMed.onclick  = ()=>setLevel("med");
+    btnLvlHard.onclick = ()=>setLevel("hard");
 
-    btnModeWords.addEventListener("click", ()=>setMode("words"));
-    btnModeSent.addEventListener("click", ()=>setMode("sentences"));
-    btnLvlEasy.addEventListener("click", ()=>setLevel("easy"));
-    btnLvlMed.addEventListener("click", ()=>setLevel("med"));
-    btnLvlHard.addEventListener("click", ()=>setLevel("hard"));
-
-    // =========================
-    // Teacher drawer
-    // =========================
+    // ===== Teacher overlay =====
     function openInfo(){ overlay.classList.add("open"); }
     function closeInfo(){ overlay.classList.remove("open"); }
-    btnInfo.addEventListener("click", openInfo);
-    btnCloseInfo.addEventListener("click", closeInfo);
-    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
-    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
+    btnInfo.onclick = openInfo;
+    btnCloseInfo.onclick = closeInfo;
+    overlay.addEventListener("click",(e)=>{ if(e.target===overlay) closeInfo(); });
+    window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeInfo(); });
 
-    // =========================
-    // Audio (only after interaction)
-    // =========================
-    let audioOk = null, audioBad = null, audioWon = null;
-    function initAudio(){
-      audioOk  = new Audio(AUDIO_OK_URL);
+    // ===== Audio (init only after interaction) =====
+    let audioOk=null, audioBad=null, audioWon=null;
+    function ensureAudio(){
+      if(audioOk && audioBad && audioWon) return;
+      audioOk = new Audio(AUDIO_OK_URL);
       audioBad = new Audio(AUDIO_BAD_URL);
       audioWon = new Audio(AUDIO_WON_URL);
     }
     function play(a){
       if(!a) return;
-      try{ a.currentTime = 0; a.play(); }catch(_){}
+      try{ a.currentTime=0; a.play(); }catch(_){}
     }
-    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
-    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
-    function playWon(){ if(!audioWon) initAudio(); play(audioWon); }
+    const playOk = ()=>{ ensureAudio(); play(audioOk); };
+    const playBad= ()=>{ ensureAudio(); play(audioBad); };
+    const playWon= ()=>{ ensureAudio(); play(audioWon); };
 
-    // =========================
-    // SpeechRecognition
-    // =========================
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const hasSR = !!SR;
-    srBadge.textContent = hasSR ? "🎙️ bereit" : "🎙️ nicht verfügbar";
-    srAvail.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
-
-    let recognition = null;
-    let isListening = false;
-
-    // buffer strategy
-    let speechBuffer = "";   // finals only
-    let finalChunks = [];
-    let hadFinalChunk = false;
-    let silenceTimer = null;
-
-    function clearSilenceTimer(){
-      if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
-    }
-    function restartSilenceTimer(){
-      clearSilenceTimer();
-      silenceTimer = setTimeout(()=>{
-        // auto-stop ONLY if we already have something final
-        if(isListening && hadFinalChunk){
-          stopListening(false);
-          onUtteranceFinished();
-        }
-      }, SILENCE_MS);
+    // ===== Helpers =====
+    function setFeedback(msg, kind){
+      feedback.textContent = msg;
+      feedback.classList.remove("ok","bad");
+      if(kind==="ok") feedback.classList.add("ok");
+      if(kind==="bad") feedback.classList.add("bad");
     }
 
-    function setupRecognition(){
-      if(!hasSR) return;
-      recognition = new SR();
-      recognition.lang = SR_LANG;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 8;
-
-      recognition.onresult = (event)=>{
-        for(let i = event.resultIndex; i < event.results.length; i++){
-          const res = event.results[i];
-          const transcript = (res && res[0] ? res[0].transcript : "").trim();
-          if(!transcript) continue;
-          if(res.isFinal){
-            const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
-            if(transcript !== last){
-              finalChunks.push(transcript);
-              if(finalChunks.length > 80) finalChunks = finalChunks.slice(-80);
-              if(speechBuffer) speechBuffer += " ";
-              speechBuffer += transcript;
-              hadFinalChunk = true;
-            }
-          }
-        }
-        restartSilenceTimer();
-      };
-
-      recognition.onerror = ()=>{
-        setFeedback("Fehler bei der Spracherkennung.", "bad");
-        stopListening(true);
-      };
-
-      recognition.onend = ()=>{
-        isListening = false;
-        updateMicButton();
-        clearSilenceTimer();
-      };
-    }
-
-    function startListening(){
-      if(!hasSR || !recognition) return;
-
-      // Reset attempt buffers
-      speechBuffer = "";
-      finalChunks = [];
-      hadFinalChunk = false;
-
-      // Hide spoken text until finished
-      spokenLine.textContent = "";
-      spokenLine.classList.add("hidden");
-
-      recognition.lang = SR_LANG;
-
-      try{
-        recognition.start();
-        isListening = true;
-        updateMicButton();
-        setFeedback("Sprich jetzt.", "");
-        restartSilenceTimer();
-      }catch(_){
-        setFeedback("Spracherkennung konnte nicht gestartet werden.", "bad");
-        isListening = false;
-        updateMicButton();
+    function shuffleInPlace(arr){
+      for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
       }
+      return arr;
     }
 
-    function stopListening(isError){
-      if(!hasSR || !recognition) return;
-      try{ recognition.stop(); }catch(_){}
-      isListening = false;
-      updateMicButton();
-      clearSilenceTimer();
-      if(isError){
-        spokenLine.textContent = "";
-        spokenLine.classList.add("hidden");
+    // Fit target to one line by shrinking font-size until it fits
+    function fitOneLine(el, maxPx=56, minPx=18){
+      el.style.fontSize = maxPx+"px";
+      let size = maxPx;
+      let guard = 0;
+      while(guard<80 && el.scrollWidth>el.clientWidth && size>minPx){
+        size -= 2;
+        el.style.fontSize = size+"px";
+        guard++;
       }
+      return size;
     }
-
-    function updateMicButton(){
-      btnMic.textContent = isListening ? "⏹️ Stop" : "🎤 Sprechen";
-      btnMic.classList.toggle("bad", isListening);
-      btnMic.classList.toggle("ok", !isListening);
-      srBadge.textContent = hasSR ? (isListening ? "🎙️ hört zu…" : "🎙️ bereit") : "🎙️ nicht verfügbar";
+    function setTargetDisplay(text){
+      targetLine.textContent = text;
+      const size = fitOneLine(targetLine, 56, 18);
+      spokenLine.style.fontSize = size+"px"; // keep spoken same size
     }
+    window.addEventListener("resize", ()=>{
+      if(run && run.lastTarget) setTargetDisplay(run.lastTarget);
+    });
 
-    // =========================
-    // Matching (case-insensitive)
-    // =========================
+    // ===== Normalization & deterministic matching =====
     function normalizeText(s, opts){
       const remove = !!(opts && opts.removeFillers);
-      let t = (s || "").toLowerCase();
+      let t = (s||"").toLowerCase();
 
       try{ t = t.replace(/[^\p{L}\p{N}\s]/gu, " "); }
       catch(_){ t = t.replace(/[^a-z0-9äöüß\s]/gi, " "); }
 
-      t = t.replace(/\s+/g, " ").trim();
-      t = t.replace(/ß/g, "ss");
+      t = t.replace(/\s+/g," ").trim();
+      t = t.replace(/ß/g,"ss");
 
       if(remove){
         const parts = t.split(" ").filter(Boolean).filter(w => !FILLERS.has(w));
@@ -670,107 +572,66 @@
       }
       return t;
     }
-    function tokenize(norm){ return (norm ? norm.split(" ").filter(Boolean) : []); }
-    function escapeRegex(s){ return (s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-    function containsWholeWordToken(spokenNorm, targetNorm){
+    function tokenize(norm){ return norm ? norm.split(" ").filter(Boolean) : []; }
+    function escapeRegex(s){ return (s||"").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+    function containsWholeWord(spokenNorm, targetNorm){
       const w = targetNorm.trim();
       if(!w) return false;
-      const re = new RegExp("(^|\\s)" + escapeRegex(w) + "($|\\s)");
+      const re = new RegExp("(^|\\s)"+escapeRegex(w)+"($|\\s)");
       return re.test(spokenNorm);
     }
-    function isSubsequenceMatch(targetTokens, spokenTokens, threshold){
-      if(targetTokens.length === 0) return false;
-      let i = 0;
-      for(let j = 0; j < spokenTokens.length && i < targetTokens.length; j++){
-        if(spokenTokens[j] === targetTokens[i]) i++;
+    function subseqMatch(targetTokens, spokenTokens, threshold){
+      if(!targetTokens.length) return false;
+      let i=0;
+      for(let j=0;j<spokenTokens.length && i<targetTokens.length;j++){
+        if(spokenTokens[j]===targetTokens[i]) i++;
       }
-      return (i / targetTokens.length) >= threshold;
+      return (i/targetTokens.length) >= threshold;
     }
-    function compareDeterministic(targetText, spokenTextRaw, mode){
+    function compareDeterministic(targetText, spokenRaw, mode){
       const tNorm = normalizeText(targetText, {removeFillers: removeFillers.checked});
-      const sNorm = normalizeText(spokenTextRaw, {removeFillers: removeFillers.checked});
+      const sNorm = normalizeText(spokenRaw, {removeFillers: removeFillers.checked});
       if(!tNorm || !sNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
 
-      if(mode === "words"){
+      if(mode==="words"){
         const tTokens = tokenize(tNorm);
-        if(tTokens.length === 1){
-          return {ok: containsWholeWordToken(sNorm, tNorm), spokenNorm:sNorm, targetNorm:tNorm};
+        if(tTokens.length===1){
+          return {ok: containsWholeWord(sNorm, tNorm), spokenNorm:sNorm, targetNorm:tNorm};
         }
-        return {ok: isSubsequenceMatch(tTokens, tokenize(sNorm), 1.0), spokenNorm:sNorm, targetNorm:tNorm};
+        return {ok: subseqMatch(tTokens, tokenize(sNorm), 1.0), spokenNorm:sNorm, targetNorm:tNorm};
       }
 
+      // sentences
       const longerIsSpoken = sNorm.length >= tNorm.length;
       if(longerIsSpoken && sNorm.includes(tNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
       if(!longerIsSpoken && tNorm.includes(sNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
 
-      return {ok: isSubsequenceMatch(tokenize(tNorm), tokenize(sNorm), 0.90), spokenNorm:sNorm, targetNorm:tNorm};
+      return {ok: subseqMatch(tokenize(tNorm), tokenize(sNorm), 0.90), spokenNorm:sNorm, targetNorm:tNorm};
     }
 
-    // =========================
-    // Fit text so it stays on one line (no ellipsis in normal cases)
-    // We keep nowrap and reduce font-size until it fits.
-    // =========================
-    function fitOneLine(boxEl, maxPx, minPx){
-      boxEl.style.fontSize = maxPx + "px";
-      // force reflow
-      let tries = 0;
-      while(tries < 40 && boxEl.scrollWidth > boxEl.clientWidth && maxPx > minPx){
-        maxPx -= 2;
-        boxEl.style.fontSize = maxPx + "px";
-        tries++;
-      }
-      return maxPx;
-    }
-    function fitTargetAndSpoken(targetText){
-      targetLine.textContent = targetText;
-      const size = fitOneLine(targetLine, 56, 18);
-      spokenLine.style.fontSize = size + "px";
-    }
-    window.addEventListener("resize", ()=>{
-      if(run && run.lastTarget){
-        fitTargetAndSpoken(run.lastTarget);
-      }
-    });
-
-    // =========================
-    // Run state
-    // =========================
+    // ===== Run state =====
     let run = null;
 
     function buildPool(){
-      if(uiMode === "words"){
-        if(uiLevel === "easy") return WORDS_LVL1.slice();
-        if(uiLevel === "med")  return WORDS_LVL2.slice();
+      if(uiMode==="words"){
+        if(uiLevel==="easy") return WORDS_LVL1.slice();
+        if(uiLevel==="med") return WORDS_LVL2.slice();
         return WORDS_LVL3.slice();
       }else{
-        if(uiLevel === "easy") return SENT_LVL1.slice();
-        if(uiLevel === "med")  return SENT_LVL2.slice();
+        if(uiLevel==="easy") return SENT_LVL1.slice();
+        if(uiLevel==="med") return SENT_LVL2.slice();
         return SENT_LVL3.slice();
       }
-    }
-    function shuffleInPlace(arr){
-      for(let i = arr.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
     }
     function updateCounts(){
       rightCount.textContent = String(run ? run.right : 0);
       wrongCount.textContent = String(run ? run.wrong : 0);
     }
-    function setFeedback(text, kind){
-      feedback.textContent = text;
-      feedback.classList.remove("ok","bad");
-      if(kind === "ok") feedback.classList.add("ok");
-      if(kind === "bad") feedback.classList.add("bad");
-    }
-
     function goStart(){
       screenStart.classList.remove("hidden");
       screenQuiz.classList.add("hidden");
       screenResult.classList.add("hidden");
-      if(isListening) stopListening(true);
+      stopListening(false);
     }
     function goQuiz(){
       screenStart.classList.add("hidden");
@@ -781,26 +642,21 @@
       screenStart.classList.add("hidden");
       screenQuiz.classList.add("hidden");
       screenResult.classList.remove("hidden");
-      if(isListening) stopListening(true);
+      stopListening(false);
       resRight.textContent = String(run ? run.right : 0);
       resWrong.textContent = String(run ? run.wrong : 0);
-      if(run && run.right === TASKS_TOTAL && run.wrong === 0) playWon();
+      if(run && run.right===TASKS_TOTAL && run.wrong===0) playWon();
     }
 
     function loadTask(){
       if(!run) return;
-      if(run.index >= TASKS_TOTAL){
-        goResult();
-        return;
-      }
+      if(run.index >= TASKS_TOTAL){ goResult(); return; }
+
       run.lastTarget = run.items[run.index];
+      progressText.textContent = `Aufgabe ${run.index+1} von ${TASKS_TOTAL}`;
 
-      progressText.textContent = `Aufgabe ${run.index + 1} von ${TASKS_TOTAL}`;
+      setTargetDisplay(run.lastTarget);
 
-      // show target (case preserved) + fit to one line
-      fitTargetAndSpoken(run.lastTarget);
-
-      // hide spoken line until finished
       spokenLine.textContent = "";
       spokenLine.classList.add("hidden");
 
@@ -816,159 +672,242 @@
     }
 
     function startRun(){
-      const pool = buildPool();
-      const items = pool.slice();
-      if(orderSel.value === "random") shuffleInPlace(items);
-
-      run = { mode: uiMode, items, index: 0, right: 0, wrong: 0, lastTarget: "" };
-
-      if(hasSR && !recognition) setupRecognition();
+      const items = buildPool();
+      if(orderSel.value==="random") shuffleInPlace(items);
+      run = { mode: uiMode, items, index:0, right:0, wrong:0, lastTarget:"" };
       goQuiz();
       loadTask();
-      updateMicButton();
+      updateMicUI();
+    }
+    btnStart.onclick = startRun;
+
+    // ===== SpeechRecognition (robust, button starts recording) =====
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasSR = !!SR;
+    srBadge.textContent = hasSR ? "🎙️ bereit" : "🎙️ nicht verfügbar";
+    srAvail.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
+
+    let recognition = null;
+    let isListening = false;
+
+    let speechBuffer = "";
+    let hadFinalChunk = false;
+    let lastFinal = "";
+    let silenceTimer = null;
+    let pendingAutoFinalize = false;
+
+    function clearSilence(){
+      if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer=null; }
+    }
+    function bumpSilenceTimer(){
+      clearSilence();
+      silenceTimer = setTimeout(()=>{
+        if(isListening && hadFinalChunk){
+          pendingAutoFinalize = true;
+          stopListening(false);
+        }
+      }, SILENCE_MS);
     }
 
-    function onUtteranceFinished(){
-      if(!run) return;
+    function ensureRecognition(){
+      if(!hasSR || recognition) return;
 
-      const spokenRaw = (hasSR ? (speechBuffer || "").trim() : (fallbackInput.value || "").trim());
-      const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
+      recognition = new SR();
+      recognition.lang = SR_LANG;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 8;
 
-      // show normalized spoken after finished
-      spokenLine.textContent = cmp.spokenNorm || "";
-      spokenLine.classList.remove("hidden");
+      recognition.onresult = (event)=>{
+        // IMPORTANT: bump timer on any result (including interim),
+        // but append only final chunks.
+        bumpSilenceTimer();
 
-      // fit spoken to same size as target (already set)
-      // (spokenLine font-size is synced in fitTargetAndSpoken)
+        for(let i=event.resultIndex;i<event.results.length;i++){
+          const res = event.results[i];
+          const alt0 = res && res[0] ? res[0].transcript : "";
+          const txt = (alt0 || "").trim();
+          if(!txt) continue;
 
-      if(cmp.ok){
-        run.right++;
-        setFeedback("Richtig ✅", "ok");
-        playOk();
-        updateCounts();
-        setTimeout(()=>{
-          run.index++;
-          loadTask();
-        }, NEXT_DELAY_MS);
-      }else{
-        run.wrong++;
-        const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
-        setFeedback("Falsch ❌" + extra, "bad");
-        playBad();
-        updateCounts();
-        // repeat allowed: user presses mic again
-      }
-    }
-
-    // =========================
-    // Buttons
-    // =========================
-    btnStart.addEventListener("click", startRun);
-
-    btnMic.addEventListener("click", ()=>{
-      if(!audioOk || !audioBad || !audioWon) initAudio(); // user interaction unlocks audio
-
-      if(!hasSR){
-        setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
-        fallbackWrap.classList.remove("hidden");
-        return;
-      }
-      if(!recognition) setupRecognition();
-
-      if(isListening){
-        // manual stop -> auto-check if anything was captured
-        stopListening(false);
-        setTimeout(()=>{
-          if(hadFinalChunk){
-            onUtteranceFinished();
-          }else{
-            setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
-            playBad();
-            spokenLine.textContent = "";
-            spokenLine.classList.add("hidden");
+          if(res.isFinal){
+            // dedup repeated finals
+            if(txt !== lastFinal){
+              lastFinal = txt;
+              speechBuffer = (speechBuffer ? speechBuffer + " " : "") + txt;
+              hadFinalChunk = true;
+            }
           }
-        }, 80);
-      }else{
-        // START recording ONLY on button click (as requested)
-        startListening();
-      }
-    });
+        }
+      };
 
-    btnFallbackOk.addEventListener("click", ()=>{
-      if(!audioOk || !audioBad || !audioWon) initAudio();
-      if(!run) return;
-      onUtteranceFinished();
-    });
+      recognition.onerror = (e)=>{
+        // On many systems you only get results after permission; show helpful msg.
+        setFeedback("Mikrofon/Spracherkennung-Fehler. Bitte Mikrofon erlauben und nochmals drücken.", "bad");
+        pendingAutoFinalize = false;
+        stopListening(true);
+      };
 
-    btnDone.addEventListener("click", ()=>{ try{ window.parent.postMessage("AppSolved","*"); }catch(_){} });
-    btnPractice.addEventListener("click", ()=>{ run = null; goStart(); });
+      recognition.onend = ()=>{
+        // Browser stops listening (also after stop())
+        isListening = false;
+        updateMicUI();
+        clearSilence();
 
-    // =========================
-    // Start selections
-    // =========================
-    // Mode + level buttons already wired above
-
-    // =========================
-    // Init
-    // =========================
-    if(hasSR){
-      setupRecognition();
-    }else{
-      fallbackWrap.classList.remove("hidden");
+        if(pendingAutoFinalize){
+          pendingAutoFinalize = false;
+          finalizeAttempt();
+        }
+      };
     }
-    goStart();
-    updateMicButton();
 
-    function updateMicButton(){
+    function updateMicUI(){
       btnMic.textContent = isListening ? "⏹️ Stop" : "🎤 Sprechen";
       btnMic.classList.toggle("bad", isListening);
       btnMic.classList.toggle("ok", !isListening);
       srBadge.textContent = hasSR ? (isListening ? "🎙️ hört zu…" : "🎙️ bereit") : "🎙️ nicht verfügbar";
     }
 
-    // redefine startListening with local state update after updateMicButton is defined
-    const _startListening = startListening;
     function startListening(){
-      if(!hasSR || !recognition) return;
+      if(!hasSR) return;
+      ensureRecognition();
 
+      // reset attempt buffers
       speechBuffer = "";
-      finalChunks = [];
       hadFinalChunk = false;
+      lastFinal = "";
+      pendingAutoFinalize = false;
 
+      // spoken appears only after finish
       spokenLine.textContent = "";
       spokenLine.classList.add("hidden");
 
-      recognition.lang = SR_LANG;
-
       try{
-        recognition.start();
+        recognition.lang = SR_LANG;
+        recognition.start(); // MUST be inside click handler (user gesture)
         isListening = true;
-        updateMicButton();
+        updateMicUI();
         setFeedback("Sprich jetzt.", "");
-        restartSilenceTimer();
+        bumpSilenceTimer();
       }catch(_){
-        setFeedback("Spracherkennung konnte nicht gestartet werden.", "bad");
+        setFeedback("Spracherkennung konnte nicht gestartet werden. Bitte nochmals drücken.", "bad");
         isListening = false;
-        updateMicButton();
+        updateMicUI();
       }
     }
 
-    // patch stopListening to update button
-    const _stopListening = stopListening;
-    function stopListening(isError){
+    function stopListening(fromError){
       if(!hasSR || !recognition) return;
       try{ recognition.stop(); }catch(_){}
       isListening = false;
-      updateMicButton();
-      clearSilenceTimer();
-      if(isError){
-        spokenLine.textContent = "";
-        spokenLine.classList.add("hidden");
+      updateMicUI();
+      clearSilence();
+      if(fromError){
+        pendingAutoFinalize = false;
       }
     }
 
-    // Expose patched functions to the closures used above by reassigning
-    // (JS function hoisting allows this safely in this IIFE)
+    function finalizeAttempt(){
+      if(!run) return;
+
+      const spokenRaw = (speechBuffer || "").trim();
+
+      if(!spokenRaw){
+        setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
+        ensureAudio(); playBad();
+        spokenLine.textContent = "";
+        spokenLine.classList.add("hidden");
+        return;
+      }
+
+      const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
+
+      // show ONLY normalized spoken text (blue), after finished
+      spokenLine.textContent = cmp.spokenNorm || "";
+      spokenLine.classList.remove("hidden");
+
+      if(cmp.ok){
+        run.right++;
+        setFeedback("Richtig ✅", "ok");
+        ensureAudio(); playOk();
+        updateCounts();
+
+        setTimeout(()=>{
+          run.index++;
+          loadTask();
+        }, 450);
+      }else{
+        run.wrong++;
+        const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
+        setFeedback("Falsch ❌" + extra, "bad");
+        ensureAudio(); playBad();
+        updateCounts();
+        // repeat allowed: user presses "Sprechen" again
+      }
+    }
+
+    // Mic button: START recording only when clicked
+    btnMic.onclick = ()=>{
+      ensureAudio(); // user interaction unlocks audio
+
+      if(!hasSR){
+        fallbackWrap.classList.remove("hidden");
+        setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
+        return;
+      }
+
+      if(isListening){
+        // manual stop => finalize if any final text exists
+        pendingAutoFinalize = false;
+        stopListening(false);
+        setTimeout(()=>{
+          if(hadFinalChunk) finalizeAttempt();
+          else{
+            setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
+            playBad();
+            spokenLine.textContent = "";
+            spokenLine.classList.add("hidden");
+          }
+        }, 120);
+      }else{
+        startListening();
+      }
+    };
+
+    // Fallback
+    btnFallbackOk.onclick = ()=>{
+      ensureAudio();
+      if(!run) return;
+
+      const spokenRaw = (fallbackInput.value || "").trim();
+      const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
+
+      spokenLine.textContent = cmp.spokenNorm || "";
+      spokenLine.classList.remove("hidden");
+
+      if(cmp.ok){
+        run.right++;
+        setFeedback("Richtig ✅", "ok");
+        playOk();
+        updateCounts();
+        setTimeout(()=>{ run.index++; loadTask(); }, 450);
+      }else{
+        run.wrong++;
+        const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
+        setFeedback("Falsch ❌" + extra, "bad");
+        playBad();
+        updateCounts();
+      }
+    };
+
+    // Results buttons
+    btnDone.onclick = ()=>{ try{ window.parent.postMessage("AppSolved","*"); }catch(_){} };
+    btnPractice.onclick = ()=>{ run=null; goStart(); };
+
+    // Init
+    if(!hasSR) fallbackWrap.classList.remove("hidden");
+    else ensureRecognition();
+    goStart();
+    updateMicUI();
   })();
   </script>
 </body>
