@@ -6,12 +6,6 @@
   <title>Vorlese-App – Lesefluss (Frontend)</title>
 
   <style>
-    /* =========================
-       FONT: Deutschschweizer Basisschrift
-       Passe Dateinamen/Pfade an dein Repo an:
-       - ./fonts/DeutschschweizerBasisschrift.otf
-       - ./fonts/DeutschschweizerBasisschrift.ttf
-       ========================= */
     @font-face{
       font-family:"Deutschschweizer Basisschrift";
       src:
@@ -37,6 +31,7 @@
         "Deutschschweizer Basisschrift",
         system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
     }
+
     html,body{height:100%;}
     body{
       margin:0;
@@ -51,34 +46,18 @@
       padding:18px;
       box-sizing:border-box;
     }
-    .app{
-      width:min(1100px, 100%);
-      display:grid;
-      gap:14px;
-      position:relative;
-    }
+    .app{width:min(1100px, 100%); display:grid; gap:14px;}
     .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
       padding:12px 14px;
       border:1px solid var(--border);
       border-radius:var(--radius);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       box-shadow:var(--shadow);
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:900;
-      letter-spacing:.2px;
-    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px;}
     .badge{
-      font-size:12px;
-      padding:3px 8px;
-      border-radius:999px;
+      font-size:12px; padding:3px 8px; border-radius:999px;
       border:1px solid var(--border);
       color:var(--muted);
       background:rgba(0,0,0,.18);
@@ -90,45 +69,13 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .section{
-      padding:16px;
-      display:grid;
-      gap:14px;
-    }
-    .row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-    .grid{
-      display:grid;
-      gap:12px;
-      grid-template-columns: repeat(12, 1fr);
-    }
+    .section{padding:16px; display:grid; gap:14px;}
+    .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+    .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr);}
     .col-6{grid-column: span 6;}
     .col-12{grid-column: span 12;}
-    @media (max-width: 860px){
-      .col-6{grid-column: span 12;}
-    }
-    label{
-      font-size:13px;
-      color:var(--muted);
-      display:block;
-      margin-bottom:6px;
-    }
-    select,input[type="text"],textarea{
-      width:100%;
-      box-sizing:border-box;
-      background:rgba(0,0,0,.22);
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 12px;
-      outline:none;
-      font-size:16px;
-      font-family: inherit;
-    }
+    @media (max-width: 860px){ .col-6{grid-column: span 12;} }
+
     .btn{
       appearance:none;
       border:1px solid var(--border);
@@ -159,53 +106,56 @@
     }
     .btn.ghost{background:transparent;}
     .btn[disabled]{opacity:.55; cursor:not-allowed;}
-    .btn.big{
-      padding:14px 16px;
-      font-size:18px;
-      border-radius:16px;
-    }
+    .btn.big{padding:14px 16px; font-size:18px; border-radius:16px;}
 
     .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
       border:1px solid var(--border);
       background:rgba(0,0,0,.16);
       color:var(--muted);
       font-size:13px;
     }
 
+    /* ===== TARGET MUST FIT IN ONE LINE ===== */
     .bigTarget{
-      font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
-      line-height:1.15;
+      line-height:1.2;
       letter-spacing:.2px;
       padding:14px 16px;
       border-radius:16px;
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
       font-family: inherit;
+
+      white-space:nowrap;          /* one line */
+      overflow:hidden;             /* no wrap */
+      text-overflow:ellipsis;      /* safety if too long */
+      width:100%;
+      box-sizing:border-box;
+      font-size: clamp(20px, 4.2vw, 54px);
     }
+
+    /* Spoken appears only after finished reading */
     .spokenNormBig{
-      /* exactly same font settings as bigTarget */
-      font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
-      line-height:1.15;
+      line-height:1.2;
       letter-spacing:.2px;
       padding:14px 16px;
       border-radius:16px;
       border:1px dashed rgba(122,162,255,.55);
       background:rgba(122,162,255,.08);
       font-family: inherit;
-      color: var(--accent); /* blue */
-      min-height: 1.15em;
-      white-space:pre-wrap;
-      word-break:break-word;
+      color: var(--accent);
+
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      width:100%;
+      box-sizing:border-box;
+      font-size: clamp(20px, 4.2vw, 54px);
     }
 
-    .muted{color:var(--muted);}
     .feedback{
       padding:12px 14px;
       border-radius:14px;
@@ -220,8 +170,9 @@
     .hidden{display:none !important;}
     .divider{height:1px; background:var(--border); margin:6px 0;}
     .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
+    .muted{color:var(--muted);}
 
-    /* Info button */
+    /* Info button + overlay */
     .infoBtn{
       width:44px;height:44px;border-radius:999px;
       border:1px solid rgba(122,162,255,.55);
@@ -234,7 +185,6 @@
     .infoBtn:active{transform:translateY(1px);}
     .infoBtn span{font-size:18px; line-height:1; transform:translateY(-1px);}
 
-    /* Teacher overlay */
     .overlay{
       position:fixed; inset:0;
       background:rgba(0,0,0,.55);
@@ -322,7 +272,7 @@
           <button id="btnStart" class="btn primary big">Start</button>
         </div>
 
-        <div class="footerNote">Tipp: 🎤 Sprechen → laut lesen → Überprüfen.</div>
+        <div class="footerNote">🎤 Sprechen → laut lesen. Das Überprüfen passiert automatisch.</div>
       </div>
     </div>
 
@@ -334,24 +284,25 @@
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
         </div>
 
+        <!-- Target: always single line -->
         <div id="targetBox" class="bigTarget">…</div>
 
-        <!-- Only normalized spoken text (big, same style, blue) -->
-        <div id="spokenNormBig" class="spokenNormBig"> </div>
+        <!-- Spoken: hidden until end-of-utterance -->
+        <div id="spokenNormBig" class="spokenNormBig hidden"></div>
 
         <div class="row">
           <button id="btnMic" class="btn ok big">🎤 Sprechen</button>
-          <button id="btnCheck" class="btn primary big">Überprüfen</button>
-          <button id="btnNext" class="btn ghost big" disabled>Nächste</button>
         </div>
 
         <div id="fallbackWrap" class="grid hidden">
           <div class="col-12">
-            <div class="feedback bad">Spracherkennung ist nicht verfügbar. Bitte Text eingeben.</div>
+            <div class="feedback bad">Spracherkennung ist nicht verfügbar. Bitte Text eingeben und „OK“ drücken.</div>
           </div>
           <div class="col-12">
-            <label for="fallbackInput">Eingabe</label>
             <input id="fallbackInput" type="text" placeholder="Gelesenen Text eingeben…" />
+          </div>
+          <div class="col-12">
+            <button id="btnFallbackOk" class="btn primary big" type="button">OK</button>
           </div>
         </div>
 
@@ -381,7 +332,7 @@
       </div>
     </div>
 
-    <!-- TEACHER INFO / SETTINGS -->
+    <!-- TEACHER INFO -->
     <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Info">
       <div class="drawer">
         <div class="drawerHeader">
@@ -402,11 +353,9 @@
           </div>
 
           <div class="col-6">
-            <label>Audio-Pfad</label>
+            <label>Audio</label>
             <div class="footerNote">
-              Fix: <span style="font-weight:900;">/audio/correct.wav</span>,
-              <span style="font-weight:900;">/audio/error.wav</span>,
-              <span style="font-weight:900;">/audio/gamewon.wav</span>
+              Fix: <b>/audio/correct.wav</b>, <b>/audio/error.wav</b>, <b>/audio/gamewon.wav</b>
             </div>
           </div>
 
@@ -419,7 +368,7 @@
           </div>
 
           <div class="col-6">
-            <label>Feedback</label>
+            <label>Fehler-Text</label>
             <label class="pill" style="cursor:pointer; width:fit-content;">
               <input id="showExpectedOnFail" type="checkbox" />
               Bei Fehler „Richtig wäre …“ anzeigen
@@ -429,10 +378,11 @@
           <div class="col-12">
             <div class="divider"></div>
             <div class="footerNote">
-              Spracherkennung ist fix auf <b>de-CH</b> gesetzt. Normalisierung ersetzt zusätzlich deterministisch <b>ß → ss</b>.
+              Spracherkennung: <b>de-CH</b>. Normalisierung: deterministisch <b>ß → ss</b>.
+              Automatische Prüfung: Ende der Äusserung (kurze Stille) → Anzeige des gesprochenen Texts → Bewertung.
             </div>
             <div class="footerNote">
-              LearningView Abschluss: <span style="font-weight:900;">window.parent.postMessage("AppSolved","*")</span>
+              LearningView Abschluss: <b>window.parent.postMessage("AppSolved","*")</b>
             </div>
             <div class="footerNote">
               SpeechRecognition: <b id="srAvail">—</b>
@@ -448,98 +398,71 @@
   (function(){
     "use strict";
 
-    // =========================
-    // Fixed SpeechRecognition language
-    // =========================
-    const SR_LANG = "de-CH"; // Swiss German locale
-
-    // =========================
-    // Config
-    // =========================
+    const SR_LANG = "de-CH";
     const TASKS_TOTAL = 20;
     const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
 
-    // Audio fixed paths (per requirement)
-    const AUDIO_OK_URL   = "/audio/correct.wav";
-    const AUDIO_BAD_URL  = "/audio/error.wav";
-    const AUDIO_WON_URL  = "/audio/gamewon.wav";
+    const AUDIO_OK_URL  = "/audio/correct.wav";
+    const AUDIO_BAD_URL = "/audio/error.wav";
+    const AUDIO_WON_URL = "/audio/gamewon.wav";
 
-    const SILENCE_MS = 900;
+    const SILENCE_MS = 900;          // auto-stop after short silence (if at least 1 final chunk)
+    const NEXT_DELAY_MS = 450;       // small delay before next item
 
     // =========================
-    // Lists
+    // WORD LISTS (as provided)
     // =========================
     const WORDS_LVL1 = [
-      "mama","papa","oma","opa","haus","hund","katze","ball","brot","wasser",
-      "buch","schule","kind","hand","nase","mund","baum","sonne","mond","see",
-      "stuhl","tisch","apfel","saft","weg","tor","boot","maus","hase","eule"
+      "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
+      "Weg","Baum","Mond","Sonne","Stern","Brot","Apfel","Suppe","Ball","Boot",
+      "Bus","Auto","Bett","Uhr","Regen",
+      "rennt","läuft","springt","fliegt","sitzt","steht","ruft","sieht","hört","isst",
+      "trinkt","fällt","rollt","kommt","geht","bleibt","schläft","wacht","fährt","sucht",
+      "findet","nimmt","gibt","öffnet","schliesst"
     ];
     const WORDS_LVL2 = [
-      "fenster","garten","drachen","blume","fisch","wolke","regen","kuchen","tasche","jacke",
-      "wiese","vogel","kinder","pause","kiste","biber","igel","kiesel","schiff","lampe",
-      "zaun","klingel","brille","spiegel","schnee","winter","sommer","herbst","frühling","morgen"
+      "Freund","Freundin","Bande","Geheimnis","Rucksack","Schulhof","Klassenzimmer","Fahrrad","Taschenlampe","Regenjacke",
+      "Hund","Katze","Pferd","Vogel","Baum","Garten","Strasse","Brücke","Fenster","Keller",
+      "schleichen","rennen","flüstern","lachen","staunen","stolpern","verstecken","warten","suchen","finden",
+      "spannend","geheim","dunkel","hell","leise","laut","nass","mutig","neugierig","nervös",
+      "plötzlich","langsam","schnell","draussen","drinnen","vorne","hinten","oben","unten","heute"
     ];
     const WORDS_LVL3 = [
-      "eichhörnchen","schmetterling","regenbogen","abenteuer","schneeflocke","zahnbürste","feuerwehr","gummistiefel","taschenlampe","spaziergang",
-      "bilderrahmen","schnürsenkel","kastanienbaum","sternenschnuppe","sommerferien","lieblingsbuch","turnhalle","schulzimmer","trommelwirbel","drachenflieger",
-      "wasserflasche","blumenwiese","klingelton","bauernhof","himmelblau","pausenplatz","wintermantel","zirkusclown","schneemann","schokokuchen"
+      "Schulhofeingang","Klassenzimmertür","Taschenlampenlicht","Fahrradklingel","Regenpfützenrand",
+      "Kellerfensterrahmen","Baumhausleiter","Waldwegkurve","Geheimversteck","Detektivbande",
+      "Freundschaftsprobe","Mutprobe","Stimmengewirr","Türknarren","Schattenspiel",
+      "Nachtgeräusch","Windböenrauschen","Regenjackentasche","Turnhallenecke","Pausenglockenläuten",
+      "Rucksackinhalt","Schulranzenboden","Taschenmessergriff","Fahrradkettenklackern","Pflastersteinrand",
+      "Gartenzaunlücke","Hinterhofeingang","Kellerstufengeländer","Fensterbankkante","Türspaltlicht",
+      "Flüstergespräch","Schreckmoment","Überraschungsfund","Abenteuerbeginn","Spurenfolge",
+      "Rätselaufgabe","Verdachtspunkt","Planänderung","Verfolgungsspur","Treffpunktvereinbarung",
+      "Rückzugsort","Beobachtungsposten","Taschenlampenbatterie","Zeitdruckgefühl","Versteckspiel",
+      "Freundschaftsbündnis","Angstmoment","Erleichterungsseufzer","Abschlusslachen","Heimwegentscheidung"
     ];
 
+    // =========================
+    // SENTENCE LISTS
+    // =========================
     const SENT_LVL1 = [
-      "Ich sehe einen Hund.",
-      "Du bist da.",
-      "Mama hat Zeit.",
-      "Papa ist nett.",
-      "Die Sonne ist warm.",
-      "Der Ball ist rot.",
-      "Das Kind lacht.",
-      "Ich esse Brot.",
-      "Wir trinken Wasser.",
-      "Oma liest ein Buch.",
-      "Opa kommt jetzt.",
-      "Die Katze schläft.",
-      "Der Vogel singt.",
-      "Ich gehe zur Schule.",
-      "Du rennst schnell.",
-      "Wir spielen draussen."
+      "Mama isst Brot.","Papa fährt Auto.","Die Maus rennt.","Der Bus kommt.","Das Haus ist gross.","Die Sonne scheint.","Ich sehe Meer.","Der Vogel fliegt.","Das Boot schwimmt.","Ich mag Eis.",
+      "Oma sitzt da.","Opa liest Buch.","Die Uhr tickt.","Das Bett ist weich.","Der Mond leuchtet.","Die Katze rennt.","Der Hund bellt.","Ich höre Radio.","Das Brot ist warm.","Die Suppe dampft.",
+      "Der Ball rollt.","Ich sehe Wald.","Die Wiese ist grün.","Das Auto steht.","Der Fisch springt.","Mama ruft Papa.","Papa hört zu.","Ich trinke Tee.","Die Tasse kippt.","Der Teller fällt.",
+      "Das Glas ist leer.","Die Tür geht auf.","Ich renne weg.","Wir sind da.","Das Licht geht aus.","Ich liege im Bett.","Die Uhr klingelt.","Die Sonne geht auf.","Der Mond geht hoch.","Ich sehe nichts.",
+      "Der Weg ist lang.","Wir gehen heim.","Das Haus schläft.","Die Maus frisst Brot.","Der Vogel singt.","Das Eis schmilzt.","Ich höre nichts.","Der Bus fährt weg.","Das Boot kippt fast.","Ich bin müde."
     ];
     const SENT_LVL2 = [
-      "Ich male ein Haus.",
-      "Der Baum ist gross.",
-      "Das Baby weint.",
-      "Ich höre Musik.",
-      "Wir sind froh.",
-      "Der Zug fährt weg.",
-      "Die Tür ist zu.",
-      "Das Fenster ist offen.",
-      "Ich habe Hunger.",
-      "Der Hund läuft über den Weg.",
-      "Die Katze sitzt auf dem Stuhl.",
-      "Im See schwimmt ein Fisch.",
-      "Der Regen fällt ganz fein.",
-      "Papa fährt mit dem Auto los.",
-      "Wir spielen im Hof mit dem Ball.",
-      "Ich sehe den Mond am Himmel.",
-      "Das Kind springt über einen Stein."
+      "Der Ball fliegt über den Zaun.","Wir sitzen im Zimmer.","Die Sonne blendet mich.","In der Schule ist es laut.","Die Klasse wartet unruhig.","Der Lehrer kommt spät.","Die Schülerin meldet sich.","Mein Rucksack ist zu voll.","Die Tasche fällt um.","Wir essen zu schnell.",
+      "Das Wasser schwappt über.","Der Kaffee ist viel zu heiss.","Das Messer rutscht ab.","Die Gabel liegt daneben.","Der Löffel klappert laut.","Es ist schon Mittag.","Am Nachmittag regnet es.","Am Abend wird es ruhig.","Am Morgen bin ich müde.","Der Himmel wird grau.",
+      "Eine Wolke sieht komisch aus.","Der Regen platscht laut.","Die Strasse glänzt nass.","Wir rennen über die Brücke.","Das Fenster klappert im Wind.","Die Türe fällt zu.","Ich lese heimlich weiter.","Wir schreiben viel zu langsam.","Die Rechnung stimmt nicht.","Die Kinder lachen laut.",
+      "Alle rennen durcheinander.","Ich stolpere fast.","Die Katze verschwindet schnell.","Der Hund wartet draussen.","Das Pferd stampft nervös.","Mein Freund ruft mich.","Die Freundin winkt kurz.","Die Familie sitzt zusammen.","Im Garten ist es still.","Eine Blume ist kaputt.",
+      "Der Baum knackt laut.","Die Wiese ist nass.","Ein Vogel flattert weg.","Die Katze beobachtet alles.","Der Hund zieht an der Leine.","Das Pferd schnaubt laut.","Ich höre Schritte.","Wir verstecken uns schnell.","Alle schauen gespannt.","Dann wird es still."
     ];
     const SENT_LVL3 = [
-      "Wir gehen zusammen nach Hause.",
-      "Heute backt Mama einen Kuchen.",
-      "Ich packe mein Buch in die Tasche.",
-      "Der Wind pfeift um das Haus.",
-      "Oma kocht Suppe für uns alle.",
-      "Opa erzählt eine gute Geschichte.",
-      "Der Vogel fliegt hoch hinauf.",
-      "Ich finde einen kleinen Schatz im Sand.",
-      "Wir bauen eine Burg aus Holz.",
-      "Die Sonne scheint durch das Fenster.",
-      "Ich höre ein leises Klopfen an der Tür.",
-      "Der Zug fährt schnell durch den Tunnel.",
-      "Wir räumen das Zimmer ganz auf.",
-      "Ich trage den Mantel im Winter gern.",
-      "Im Wald höre ich viele Tiere.",
-      "Am Abend putze ich meine Zähne.",
-      "Ich laufe leise zum Tor."
+      "Greg schloss die Tür, weil es draussen laut war.","Wir standen still, als jemand rief.","Ich drehte mich um, obwohl ich Angst hatte.","Der Ball rollte weiter, bis er im Gebüsch lag.","Sie flüsterten leise, damit niemand sie hörte.","Tom grinste, während er den Plan erklärte.","Wir warteten kurz, bevor wir losrannten.","Das Fahrrad kippte um, als der Weg rutschig wurde.","Ich blieb stehen, weil etwas raschelte.","Sie lachten laut, obwohl es unpassend war.",
+      "Der Hund bellte, als die Tür aufging.","Wir duckten uns, sobald Schritte kamen.","Der Rucksack riss, weil er zu schwer war.","Ich sah nach oben, während der Ball flog.","Sie fluchten leise, nachdem alles schiefging.","Wir rannten los, als das Signal kam.","Der Regen hörte auf, bevor wir ankamen.","Ich tat so, als wäre nichts passiert.","Sie tuschelten, obwohl alle zuhörten.","Der Plan klang gut, bis jemand widersprach.",
+      "Wir gingen weiter, obwohl der Weg dunkel war.","Er stolperte, weil er nicht aufpasste.","Ich hielt den Atem an, als es krachte.","Sie schauten sich an, während niemand sprach.","Der Hund sprang vor, sobald die Tür offen war.","Wir versteckten uns, als das Licht anging.","Ich drehte mich um, weil jemand lachte.","Sie blieben stehen, obwohl sie rennen wollten.","Der Ball verschwand, nachdem er überrollte.","Wir hörten Stimmen, während wir warteten.",
+      "Ich schloss die Augen, als es laut knallte.","Sie grinste, obwohl sie nichts sagte.","Wir duckten uns, bevor jemand kam.","Der Wind pfiff, während wir weitergingen.","Ich rannte los, als alle starrten.","Sie blieben ruhig, obwohl Chaos herrschte.","Der Hund folgte uns, bis wir verschwanden.","Wir hörten auf, als es still wurde.","Ich schaute zurück, während sie winkten.","Sie lachten wieder, nachdem alles vorbei war.",
+      "Der Plan änderte sich, weil etwas fehlte.","Wir warteten draussen, bis es dunkel wurde.","Ich flüsterte, damit niemand uns hörte.","Sie rannten weiter, obwohl sie müde waren.","Der Ball tauchte wieder auf, als niemand rechnete.","Wir gingen langsam, weil der Boden nass war.","Ich nickte, obwohl ich zweifelte.","Sie schauten weg, als es peinlich wurde.","Wir blieben stehen, bis alles ruhig war.","Dann gingen wir weiter, als wäre nichts gewesen."
     ];
 
     // =========================
@@ -565,8 +488,6 @@
     const spokenNormBig = el("spokenNormBig");
 
     const btnMic = el("btnMic");
-    const btnCheck = el("btnCheck");
-    const btnNext = el("btnNext");
 
     const feedback = el("feedback");
     const rightCount = el("rightCount");
@@ -574,6 +495,7 @@
 
     const fallbackWrap = el("fallbackWrap");
     const fallbackInput = el("fallbackInput");
+    const btnFallbackOk = el("btnFallbackOk");
 
     const resRight = el("resRight");
     const resWrong = el("resWrong");
@@ -619,10 +541,9 @@
     btnLvlHard.addEventListener("click", ()=>setLevel("hard"));
 
     // =========================
-    // Audio (fixed paths)
+    // Audio
     // =========================
     let audioOk = null, audioBad = null, audioWon = null;
-
     function initAudio(){
       audioOk  = new Audio(AUDIO_OK_URL);
       audioBad = new Audio(AUDIO_BAD_URL);
@@ -648,11 +569,29 @@
     let recognition = null;
     let isListening = false;
 
-    // Buffer strategy: final chunks only
+    // buffer: final chunks only
     let speechBuffer = "";
     let finalChunks = [];
-    let silenceTimer = null;
     let hadFinalChunk = false;
+    let silenceTimer = null;
+
+    function clearSilenceTimer(){
+      if(silenceTimer){
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+    }
+    function restartSilenceTimer(){
+      if(!hasSR) return;
+      clearSilenceTimer();
+      silenceTimer = setTimeout(()=>{
+        // auto-stop only if at least one final chunk exists
+        if(isListening && hadFinalChunk){
+          stopListening();
+          onUtteranceFinished(); // automatic check here
+        }
+      }, SILENCE_MS);
+    }
 
     function setupRecognition(){
       if(!hasSR) return;
@@ -664,7 +603,6 @@
       recognition.maxAlternatives = 8;
 
       recognition.onresult = (event)=>{
-        // collect finals + show normalized (final+interim for display)
         let interimText = "";
         for(let i = event.resultIndex; i < event.results.length; i++){
           const res = event.results[i];
@@ -675,27 +613,22 @@
             const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
             if(transcript !== last){
               finalChunks.push(transcript);
-              if(finalChunks.length > 40) finalChunks = finalChunks.slice(-40);
+              if(finalChunks.length > 60) finalChunks = finalChunks.slice(-60);
               if(speechBuffer) speechBuffer += " ";
               speechBuffer += transcript;
               hadFinalChunk = true;
             }
           }else{
-            interimText = transcript; // keep latest interim only for display
+            interimText = transcript;
           }
         }
-
-        const combined = (speechBuffer + (interimText ? (" " + interimText) : "")).trim();
-        // Show ONLY normalized spoken text, big and blue
-        const shown = normalizeText(combined, {removeFillers: removeFillers.checked});
-        spokenNormBig.textContent = shown || " ";
-
+        // don't show spoken text while speaking
         restartSilenceTimer();
       };
 
       recognition.onerror = ()=>{
         setFeedback("Fehler bei der Spracherkennung.", "bad");
-        stopListening(true);
+        stopListening();
       };
 
       recognition.onend = ()=>{
@@ -705,30 +638,17 @@
       };
     }
 
-    function restartSilenceTimer(){
-      if(!hasSR) return;
-      clearSilenceTimer();
-      silenceTimer = setTimeout(()=>{
-        if(isListening && hadFinalChunk){
-          stopListening(false);
-        }
-      }, SILENCE_MS);
-    }
-    function clearSilenceTimer(){
-      if(silenceTimer){
-        clearTimeout(silenceTimer);
-        silenceTimer = null;
-      }
-    }
-
     function startListening(){
       if(!hasSR || !recognition) return;
 
-      // reset buffers for task
+      // reset buffers for attempt (repeat allowed)
       speechBuffer = "";
       finalChunks = [];
       hadFinalChunk = false;
-      spokenNormBig.textContent = " ";
+
+      // hide spoken until finished
+      spokenNormBig.textContent = "";
+      spokenNormBig.classList.add("hidden");
 
       recognition.lang = SR_LANG;
 
@@ -775,15 +695,10 @@
       const remove = !!(opts && opts.removeFillers);
       let t = (s || "").toLowerCase();
 
-      try{
-        t = t.replace(/[^\p{L}\p{N}\s]/gu, " ");
-      }catch(_){
-        t = t.replace(/[^a-z0-9äöüß\s]/gi, " ");
-      }
+      try{ t = t.replace(/[^\p{L}\p{N}\s]/gu, " "); }
+      catch(_){ t = t.replace(/[^a-z0-9äöüß\s]/gi, " "); }
 
       t = t.replace(/\s+/g, " ").trim();
-
-      // Swiss normalization: ß -> ss (deterministic)
       t = t.replace(/ß/g, "ss");
 
       if(remove){
@@ -792,13 +707,8 @@
       }
       return t;
     }
-
-    function tokenize(norm){
-      return (norm ? norm.split(" ").filter(Boolean) : []);
-    }
-    function escapeRegex(s){
-      return (s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
+    function tokenize(norm){ return (norm ? norm.split(" ").filter(Boolean) : []); }
+    function escapeRegex(s){ return (s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
     function containsWholeWordToken(spokenNorm, targetNorm){
       const w = targetNorm.trim();
       if(!w) return false;
@@ -813,7 +723,6 @@
       }
       return (i / targetTokens.length) >= threshold;
     }
-
     function compareDeterministic(targetText, spokenTextRaw, mode){
       const tNorm = normalizeText(targetText, {removeFillers: removeFillers.checked});
       const sNorm = normalizeText(spokenTextRaw, {removeFillers: removeFillers.checked});
@@ -829,7 +738,6 @@
         return {ok: isSubsequenceMatch(tTokens, tokenize(sNorm), 1.0), spokenNorm:sNorm, targetNorm:tNorm};
       }
 
-      // sentences:
       const longerIsSpoken = sNorm.length >= tNorm.length;
       if(longerIsSpoken && sNorm.includes(tNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
       if(!longerIsSpoken && tNorm.includes(sNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
@@ -872,13 +780,10 @@
         index: 0,
         right: 0,
         wrong: 0,
-        checked: false,
         lastTarget: ""
       };
 
       if(hasSR && !recognition) setupRecognition();
-      // init audio is intentionally deferred until first interaction,
-      // but starting also counts as interaction in many browsers. We'll init here safely:
       if(!audioOk || !audioBad || !audioWon) initAudio();
 
       goQuiz();
@@ -905,7 +810,6 @@
       resRight.textContent = String(run ? run.right : 0);
       resWrong.textContent = String(run ? run.wrong : 0);
 
-      // Play gamewon.wav ONLY if all 20 correct and user already interacted (audio initialized)
       if(run && run.right === TASKS_TOTAL && run.wrong === 0){
         playWon();
       }
@@ -935,15 +839,12 @@
       progressText.textContent = `Aufgabe ${run.index + 1} von ${TASKS_TOTAL}`;
       targetBox.textContent = run.lastTarget;
 
-      spokenNormBig.textContent = " ";
+      // hide spoken display until finish
+      spokenNormBig.textContent = "";
+      spokenNormBig.classList.add("hidden");
+
       setFeedback("Bereit.", "");
-      run.checked = false;
-
-      speechBuffer = "";
-      finalChunks = [];
-      hadFinalChunk = false;
-
-      btnNext.disabled = true;
+      updateCounts();
 
       if(!hasSR){
         fallbackWrap.classList.remove("hidden");
@@ -951,52 +852,40 @@
       }else{
         fallbackWrap.classList.add("hidden");
       }
-
-      updateCounts();
     }
 
-    function getSpokenRawForCheck(){
-      if(!hasSR){
-        return (fallbackInput.value || "").trim();
-      }
-      // Use ONLY final buffer for checking (deterministic)
-      return (speechBuffer || "").trim();
+    function getSpokenRawForAutoCheck(){
+      if(!hasSR) return (fallbackInput.value || "").trim();
+      return (speechBuffer || "").trim(); // finals only
     }
 
-    function doCheck(){
-      if(!run) return;
-
-      // user interaction => audio allowed
-      if(!audioOk || !audioBad || !audioWon) initAudio();
-
-      if(isListening) stopListening();
-
-      const spokenRaw = getSpokenRawForCheck();
+    function onUtteranceFinished(){
+      // reveal spoken normalized text now
+      const spokenRaw = getSpokenRawForAutoCheck();
       const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
 
-      // show only normalized spoken (already blue big display)
-      spokenNormBig.textContent = cmp.spokenNorm || " ";
+      spokenNormBig.textContent = cmp.spokenNorm || "";
+      spokenNormBig.classList.remove("hidden");
 
       if(cmp.ok){
         run.right++;
         setFeedback("Richtig ✅", "ok");
         playOk();
+        updateCounts();
+
+        // next after short delay
+        setTimeout(()=>{
+          run.index++;
+          loadTask();
+        }, NEXT_DELAY_MS);
       }else{
         run.wrong++;
         const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
         setFeedback("Falsch ❌" + extra, "bad");
         playBad();
+        updateCounts();
+        // allow repeat: user presses mic again
       }
-
-      run.checked = true;
-      btnNext.disabled = false;
-      updateCounts();
-    }
-
-    function doNext(){
-      if(!run || !run.checked) return;
-      run.index++;
-      loadTask();
     }
 
     function doDone(){
@@ -1027,8 +916,14 @@
       toggleListening();
     });
 
-    btnCheck.addEventListener("click", doCheck);
-    btnNext.addEventListener("click", doNext);
+    btnFallbackOk.addEventListener("click", ()=>{
+      if(!audioOk || !audioBad || !audioWon) initAudio(); // interaction
+      if(!run) return;
+      // manual "finished" in fallback
+      spokenNormBig.textContent = normalizeText(getSpokenRawForAutoCheck(), {removeFillers: removeFillers.checked});
+      spokenNormBig.classList.remove("hidden");
+      onUtteranceFinished();
+    });
 
     btnDone.addEventListener("click", doDone);
     btnPractice.addEventListener("click", ()=>{
@@ -1036,11 +931,55 @@
       goStart();
     });
 
+    // =========================
+    // SR end handling:
+    // If recognition ends (manual stop) and we have final chunk, auto-check.
+    // =========================
+    function tryAutoCheckOnManualStop(){
+      if(!run) return;
+      if(hadFinalChunk){
+        onUtteranceFinished();
+      }else{
+        setFeedback("Ich habe dich nicht verstanden. Bitte nochmals sprechen.", "bad");
+        playBad();
+        // keep spoken hidden
+        spokenNormBig.textContent = "";
+        spokenNormBig.classList.add("hidden");
+      }
+    }
+
+    // Patch manual stop to trigger auto-check if finals exist
+    const originalToggle = toggleListening;
+    function toggleListeningPatched(){
+      if(!hasSR) return;
+      if(!recognition) setupRecognition();
+      if(!audioOk || !audioBad || !audioWon) initAudio();
+
+      if(isListening){
+        stopListening();
+        setTimeout(tryAutoCheckOnManualStop, 80);
+      }else{
+        startListening();
+      }
+    }
+    // replace handler
+    btnMic.removeEventListener("click", ()=>{});
+    btnMic.addEventListener("click", ()=>{
+      if(!hasSR){
+        setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
+        return;
+      }
+      toggleListeningPatched();
+    });
+
     // Init
-    if(!hasSR) fallbackWrap.classList.remove("hidden");
+    if(hasSR){
+      if(!recognition) setupRecognition();
+    }else{
+      fallbackWrap.classList.remove("hidden");
+    }
     goStart();
     updateMicButton();
-    spokenNormBig.textContent = " ";
   })();
   </script>
 </body>
