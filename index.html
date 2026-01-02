@@ -117,6 +117,7 @@
       font-size:13px;
     }
 
+    /* ✅ GANZE ZEILE, KEIN UMbruch */
     .bigTarget{
       font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
@@ -127,9 +128,14 @@
       border:1px solid var(--border);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
       font-family: inherit;
-      white-space:pre-wrap;
-      word-break:break-word;
+
+      /* wichtig: 1 Zeile */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
+    /* ✅ GANZE ZEILE UNTERHALB, KEIN Umbruch */
     .spokenNormBig{
       font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
@@ -142,8 +148,11 @@
       font-family: inherit;
       color: var(--accent);
       min-height: 1.15em;
-      white-space:pre-wrap;
-      word-break:break-word;
+
+      /* wichtig: 1 Zeile */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .feedback{
@@ -394,195 +403,67 @@
     const SILENCE_MS = 900;
 
     // =========================
-    // WORD LISTS (IMPLEMENTED AS PROVIDED)
+    // WORD LISTS
     // =========================
-
-    // 🟢 EINFACH – 1. Klasse (50) nur Nomen & Verben | lautgetreu
     const WORDS_LVL1 = [
-      // Nomen (25)
       "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
       "Weg","Baum","Mond","Sonne","Stern","Brot","Apfel","Suppe","Ball","Boot",
       "Bus","Auto","Bett","Uhr","Regen",
-      // Verben (25) (3. Person Singular)
       "rennt","läuft","springt","fliegt","sitzt","steht","ruft","sieht","hört","isst",
       "trinkt","fällt","rollt","kommt","geht","bleibt","schläft","wacht","fährt","sucht",
       "findet","nimmt","gibt","öffnet","schliesst"
     ];
 
-    // 🟡 MITTEL – 2. Klasse (50) Kinderroman-Wortschatz
     const WORDS_LVL2 = [
-      // Nomen (20)
       "Freund","Freundin","Bande","Geheimnis","Rucksack","Schulhof","Klassenzimmer","Fahrrad","Taschenlampe","Regenjacke",
       "Hund","Katze","Pferd","Vogel","Baum","Garten","Strasse","Brücke","Fenster","Keller",
-      // Verben (10)
       "schleichen","rennen","flüstern","lachen","staunen","stolpern","verstecken","warten","suchen","finden",
-      // Adjektive (10)
       "spannend","geheim","dunkel","hell","leise","laut","nass","mutig","neugierig","nervös",
-      // Sonstige (10)
       "plötzlich","langsam","schnell","draussen","drinnen","vorne","hinten","oben","unten","heute"
     ];
 
-    // 🔵 SCHWIERIG – 3. Klasse (50) NUR lange & zusammengesetzte Nomen
     const WORDS_LVL3 = [
-      "Schulhofeingang",
-      "Klassenzimmertür",
-      "Taschenlampenlicht",
-      "Fahrradklingel",
-      "Regenpfützenrand",
-      "Kellerfensterrahmen",
-      "Baumhausleiter",
-      "Waldwegkurve",
-      "Geheimversteck",
-      "Detektivbande",
-      "Freundschaftsprobe",
-      "Mutprobe",
-      "Stimmengewirr",
-      "Türknarren",
-      "Schattenspiel",
-      "Nachtgeräusch",
-      "Windböenrauschen",
-      "Regenjackentasche",
-      "Turnhallenecke",
-      "Pausenglockenläuten",
-      "Rucksackinhalt",
-      "Schulranzenboden",
-      "Taschenmessergriff",
-      "Fahrradkettenklackern",
-      "Pflastersteinrand",
-      "Gartenzaunlücke",
-      "Hinterhofeingang",
-      "Kellerstufengeländer",
-      "Fensterbankkante",
-      "Türspaltlicht",
-      "Flüstergespräch",
-      "Schreckmoment",
-      "Überraschungsfund",
-      "Abenteuerbeginn",
-      "Spurenfolge",
-      "Rätselaufgabe",
-      "Verdachtspunkt",
-      "Planänderung",
-      "Verfolgungsspur",
-      "Treffpunktvereinbarung",
-      "Rückzugsort",
-      "Beobachtungsposten",
-      "Taschenlampenbatterie",
-      "Zeitdruckgefühl",
-      "Versteckspiel",
-      "Freundschaftsbündnis",
-      "Angstmoment",
-      "Erleichterungsseufzer",
-      "Abschlusslachen",
-      "Heimwegentscheidung"
+      "Schulhofeingang","Klassenzimmertür","Taschenlampenlicht","Fahrradklingel","Regenpfützenrand",
+      "Kellerfensterrahmen","Baumhausleiter","Waldwegkurve","Geheimversteck","Detektivbande",
+      "Freundschaftsprobe","Mutprobe","Stimmengewirr","Türknarren","Schattenspiel",
+      "Nachtgeräusch","Windböenrauschen","Regenjackentasche","Turnhallenecke","Pausenglockenläuten",
+      "Rucksackinhalt","Schulranzenboden","Taschenmessergriff","Fahrradkettenklackern","Pflastersteinrand",
+      "Gartenzaunlücke","Hinterhofeingang","Kellerstufengeländer","Fensterbankkante","Türspaltlicht",
+      "Flüstergespräch","Schreckmoment","Überraschungsfund","Abenteuerbeginn","Spurenfolge",
+      "Rätselaufgabe","Verdachtspunkt","Planänderung","Verfolgungsspur","Treffpunktvereinbarung",
+      "Rückzugsort","Beobachtungsposten","Taschenlampenbatterie","Zeitdruckgefühl","Versteckspiel",
+      "Freundschaftsbündnis","Angstmoment","Erleichterungsseufzer","Abschlusslachen","Heimwegentscheidung"
     ];
 
-    // =========================
-    // SENTENCE LISTS (from previous step)
-    // =========================
     const SENT_LVL1 = [
-      "Mama isst Brot.",
-      "Papa fährt Auto.",
-      "Die Maus rennt.",
-      "Der Bus kommt.",
-      "Das Haus ist gross.",
-      "Die Sonne scheint.",
-      "Ich sehe Meer.",
-      "Der Vogel fliegt.",
-      "Das Boot schwimmt.",
-      "Ich mag Eis.",
-      "Oma sitzt da.",
-      "Opa liest Buch.",
-      "Die Uhr tickt.",
-      "Das Bett ist weich.",
-      "Der Mond leuchtet.",
-      "Die Katze rennt.",
-      "Der Hund bellt.",
-      "Ich höre Radio.",
-      "Das Brot ist warm.",
-      "Die Suppe dampft.",
-      "Der Ball rollt.",
-      "Ich sehe Wald.",
-      "Die Wiese ist grün.",
-      "Das Auto steht.",
-      "Der Fisch springt.",
-      "Mama ruft Papa.",
-      "Papa hört zu.",
-      "Ich trinke Tee.",
-      "Die Tasse kippt.",
-      "Der Teller fällt.",
-      "Das Glas ist leer.",
-      "Die Tür geht auf.",
-      "Ich renne weg.",
-      "Wir sind da.",
-      "Das Licht geht aus.",
-      "Ich liege im Bett.",
-      "Die Uhr klingelt.",
-      "Die Sonne geht auf.",
-      "Der Mond geht hoch.",
-      "Ich sehe nichts.",
-      "Der Weg ist lang.",
-      "Wir gehen heim.",
-      "Das Haus schläft.",
-      "Die Maus frisst Brot.",
-      "Der Vogel singt.",
-      "Das Eis schmilzt.",
-      "Ich höre nichts.",
-      "Der Bus fährt weg.",
-      "Das Boot kippt fast.",
-      "Ich bin müde."
+      "Mama isst Brot.","Papa fährt Auto.","Die Maus rennt.","Der Bus kommt.","Das Haus ist gross.",
+      "Die Sonne scheint.","Ich sehe Meer.","Der Vogel fliegt.","Das Boot schwimmt.","Ich mag Eis.",
+      "Oma sitzt da.","Opa liest Buch.","Die Uhr tickt.","Das Bett ist weich.","Der Mond leuchtet.",
+      "Die Katze rennt.","Der Hund bellt.","Ich höre Radio.","Das Brot ist warm.","Die Suppe dampft.",
+      "Der Ball rollt.","Ich sehe Wald.","Die Wiese ist grün.","Das Auto steht.","Der Fisch springt.",
+      "Mama ruft Papa.","Papa hört zu.","Ich trinke Tee.","Die Tasse kippt.","Der Teller fällt.",
+      "Das Glas ist leer.","Die Tür geht auf.","Ich renne weg.","Wir sind da.","Das Licht geht aus.",
+      "Ich liege im Bett.","Die Uhr klingelt.","Die Sonne geht auf.","Der Mond geht hoch.","Ich sehe nichts.",
+      "Der Weg ist lang.","Wir gehen heim.","Das Haus schläft.","Die Maus frisst Brot.","Der Vogel singt.",
+      "Das Eis schmilzt.","Ich höre nichts.","Der Bus fährt weg.","Das Boot kippt fast.","Ich bin müde."
     ];
+
     const SENT_LVL2 = [
-      "Der Ball fliegt über den Zaun.",
-      "Wir sitzen im Zimmer.",
-      "Die Sonne blendet mich.",
-      "In der Schule ist es laut.",
-      "Die Klasse wartet unruhig.",
-      "Der Lehrer kommt spät.",
-      "Die Schülerin meldet sich.",
-      "Mein Rucksack ist zu voll.",
-      "Die Tasche fällt um.",
-      "Wir essen zu schnell.",
-      "Das Wasser schwappt über.",
-      "Der Kaffee ist viel zu heiss.",
-      "Das Messer rutscht ab.",
-      "Die Gabel liegt daneben.",
-      "Der Löffel klappert laut.",
-      "Es ist schon Mittag.",
-      "Am Nachmittag regnet es.",
-      "Am Abend wird es ruhig.",
-      "Am Morgen bin ich müde.",
-      "Der Himmel wird grau.",
-      "Eine Wolke sieht komisch aus.",
-      "Der Regen platscht laut.",
-      "Die Strasse glänzt nass.",
-      "Wir rennen über die Brücke.",
-      "Das Fenster klappert im Wind.",
-      "Die Türe fällt zu.",
-      "Ich lese heimlich weiter.",
-      "Wir schreiben viel zu langsam.",
-      "Die Rechnung stimmt nicht.",
-      "Die Kinder lachen laut.",
-      "Alle rennen durcheinander.",
-      "Ich stolpere fast.",
-      "Die Katze verschwindet schnell.",
-      "Der Hund wartet draussen.",
-      "Das Pferd stampft nervös.",
-      "Mein Freund ruft mich.",
-      "Die Freundin winkt kurz.",
-      "Die Familie sitzt zusammen.",
-      "Im Garten ist es still.",
-      "Eine Blume ist kaputt.",
-      "Der Baum knackt laut.",
-      "Die Wiese ist nass.",
-      "Ein Vogel flattert weg.",
-      "Die Katze beobachtet alles.",
-      "Der Hund zieht an der Leine.",
-      "Das Pferd schnaubt laut.",
-      "Ich höre Schritte.",
-      "Wir verstecken uns schnell.",
-      "Alle schauen gespannt.",
-      "Dann wird es still."
+      "Der Ball fliegt über den Zaun.","Wir sitzen im Zimmer.","Die Sonne blendet mich.","In der Schule ist es laut.",
+      "Die Klasse wartet unruhig.","Der Lehrer kommt spät.","Die Schülerin meldet sich.","Mein Rucksack ist zu voll.",
+      "Die Tasche fällt um.","Wir essen zu schnell.","Das Wasser schwappt über.","Der Kaffee ist viel zu heiss.",
+      "Das Messer rutscht ab.","Die Gabel liegt daneben.","Der Löffel klappert laut.","Es ist schon Mittag.",
+      "Am Nachmittag regnet es.","Am Abend wird es ruhig.","Am Morgen bin ich müde.","Der Himmel wird grau.",
+      "Eine Wolke sieht komisch aus.","Der Regen platscht laut.","Die Strasse glänzt nass.","Wir rennen über die Brücke.",
+      "Das Fenster klappert im Wind.","Die Türe fällt zu.","Ich lese heimlich weiter.","Wir schreiben viel zu langsam.",
+      "Die Rechnung stimmt nicht.","Die Kinder lachen laut.","Alle rennen durcheinander.","Ich stolpere fast.",
+      "Die Katze verschwindet schnell.","Der Hund wartet draussen.","Das Pferd stampft nervös.","Mein Freund ruft mich.",
+      "Die Freundin winkt kurz.","Die Familie sitzt zusammen.","Im Garten ist es still.","Eine Blume ist kaputt.",
+      "Der Baum knackt laut.","Die Wiese ist nass.","Ein Vogel flattert weg.","Die Katze beobachtet alles.",
+      "Der Hund zieht an der Leine.","Das Pferd schnaubt laut.","Ich höre Schritte.","Wir verstecken uns schnell.",
+      "Alle schauen gespannt.","Dann wird es still."
     ];
+
     const SENT_LVL3 = [
       "Greg schloss die Tür, weil es draussen laut war.",
       "Wir standen still, als jemand rief.",
@@ -618,7 +499,7 @@
       "Sie grinste, obwohl sie nichts sagte.",
       "Wir duckten uns, bevor jemand kam.",
       "Der Wind pfiff, während wir weitergingen.",
-      "Ich rannte los, als alle schauten.",   <!-- ersetzt: starrten -->
+      "Ich rannte los, als alle schauten.",
       "Sie blieben ruhig, obwohl Chaos herrschte.",
       "Der Hund folgte uns, bis wir verschwanden.",
       "Wir hörten auf, als es still wurde.",
@@ -925,7 +806,7 @@
     }
 
     // =========================
-    // RISKY WORD FILTER (Homophone / häufige SR-Verwechslungen)
+    // RISKY WORD FILTER
     // =========================
     const RISKY_WORDS = new Set([
       "starren","starrten","starre",
@@ -968,9 +849,7 @@
         else pool = SENT_LVL3.slice();
       }
 
-      // ✂️ harte Qualitätskontrolle: Verwechslungs-Fallen entfernen
       pool = pool.filter(isSafeItem);
-
       return pool;
     }
 
