@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vorlese-App – Lesefluss (Frontend)</title>
+
+  <style>
+    /* =========================
+       FONT: Deutschschweizer Basisschrift
+       Lege die Dateien z.B. in ./fonts/ ab und passe die Pfade unten an:
+       - fonts/DeutschschweizerBasisschrift.otf
+       - fonts/DeutschschweizerBasisschrift.ttf
+       ========================= */
+    @font-face{
+      font-family:"Deutschschweizer Basisschrift";
+      src:
+        url("./fonts/DeutschschweizerBasisschrift.woff2") format("woff2"),
+        url("./fonts/DeutschschweizerBasisschrift.ttf") format("truetype"),
+        url("./fonts/DeutschschweizerBasisschrift.otf") format("opentype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    /* Optional: falls du nur ttf/otf hast, kannst du die woff2-Zeile löschen.
+       Wenn die Font-Dateinamen anders sind, hier exakt anpassen. */
+
+    :root{
+      --bg:#0b1220;
+      --card:#101a2e;
+      --card2:#0f1a33;
+      --text:#e7eefc;
+      --muted:#a9b7d6;
+      --ok:#39d98a;
+      --bad:#ff5c7a;
+      --accent:#7aa2ff;
+      --border:rgba(255,255,255,.12);
+      --shadow:0 16px 40px rgba(0,0,0,.35);
+      --radius:16px;
+
+      /* >>> HIER WIRD DIE FONT GENUTZT <<< */
+      font-family:
+        "Deutschschweizer Basisschrift",
+        system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(122,162,255,.18), transparent 55%),
+                  radial-gradient(900px 700px at 90% 30%, rgba(57,217,138,.12), transparent 55%),
+                  radial-gradient(900px 700px at 30% 95%, rgba(255,92,122,.10), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      box-sizing:border-box;
+    }
+    .app{
+      width:min(1100px, 100%);
+      display:grid;
+      gap:14px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      color:var(--muted);
+      background:rgba(0,0,0,.18);
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .section{
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .grid{
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .col-6{grid-column: span 6;}
+    .col-4{grid-column: span 4;}
+    .col-8{grid-column: span 8;}
+    .col-12{grid-column: span 12;}
+    @media (max-width: 860px){
+      .col-6,.col-4,.col-8{grid-column: span 12;}
+    }
+    label{
+      font-size:13px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+    select,input[type="text"],textarea{
+      width:100%;
+      box-sizing:border-box;
+      background:rgba(0,0,0,.22);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:14px;
+
+      /* Eingabefelder auch in Basisschrift */
+      font-family: inherit;
+    }
+    textarea{min-height:92px; resize:vertical;}
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      user-select:none;
+      transition:transform .04s ease, background .12s ease, border-color .12s ease;
+      font-family: inherit;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(122,162,255,.30), rgba(122,162,255,.14));
+      border-color:rgba(122,162,255,.45);
+    }
+    .btn.ok{
+      background:linear-gradient(180deg, rgba(57,217,138,.26), rgba(57,217,138,.12));
+      border-color:rgba(57,217,138,.42);
+    }
+    .btn.bad{
+      background:linear-gradient(180deg, rgba(255,92,122,.22), rgba(255,92,122,.10));
+      border-color:rgba(255,92,122,.40);
+    }
+    .btn.ghost{
+      background:transparent;
+    }
+    .btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.16);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .bigTarget{
+      font-size: clamp(28px, 4.3vw, 54px);
+      font-weight:800;
+      line-height:1.15;
+      letter-spacing:.2px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
+
+      /* Sicherstellen, dass der Zieltext wirklich in der Basisschrift läuft */
+      font-family: inherit;
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:13px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:rgba(0,0,0,.20);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      color:#dbe6ff;
+    }
+    .muted{color:var(--muted);}
+    .feedback{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.16);
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .feedback.ok{border-color:rgba(57,217,138,.45); background:rgba(57,217,138,.12); color:#dfffea;}
+    .feedback.bad{border-color:rgba(255,92,122,.45); background:rgba(255,92,122,.10); color:#ffe2e8;}
+    .hidden{display:none !important;}
+    .divider{
+      height:1px;
+      background:var(--border);
+      margin:6px 0;
+    }
+    .footerNote{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .kpi{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .kpi .box{
+      flex: 1 1 220px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 14px;
+      background:rgba(0,0,0,.14);
+    }
+    .kpi .num{
+      font-size:28px;
+      font-weight:900;
+      line-height:1;
+      margin-top:4px;
+    }
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <span>📖 Vorlese-App</span>
+        <span class="badge">Frontend • GitHub Pages</span>
+      </div>
+      <div class="row">
+        <span id="srStatus" class="pill">🎙️ SpeechRecognition: <b id="srAvail">prüfe…</b></span>
+      </div>
+    </div>
+
+    <div id="screenStart" class="card">
+      <div class="section">
+        <div class="grid">
+          <div class="col-6">
+            <label for="modeSel">Modus</label>
+            <select id="modeSel">
+              <option value="words">Wörter</option>
+              <option value="sentences">Sätze</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label for="diffSel">Schwierigkeitsstufe</label>
+            <select id="diffSel">
+              <option value="easy">einfach</option>
+              <option value="hard">schwierig</option>
+            </select>
+          </div>
+
+          <div class="col-6">
+            <label for="orderSel">Reihenfolge</label>
+            <select id="orderSel">
+              <option value="random">Zufällig</option>
+              <option value="inorder">In Reihenfolge</option>
+            </select>
+          </div>
+
+          <div class="col-6">
+            <label for="langSel">Sprache (SpeechRecognition)</label>
+            <select id="langSel">
+              <option value="de-CH" selected>de-CH</option>
+              <option value="de-DE">de-DE</option>
+              <option value="en-US">en-US</option>
+            </select>
+          </div>
+
+          <div class="col-6">
+            <label for="audioBase">Audio-Pfad (optional)</label>
+            <input id="audioBase" type="text" placeholder="z.B. ./audio/  (Default: Root)" />
+            <div class="small">Audiofiles: correct.wav, error.wav (Default: im Root)</div>
+          </div>
+
+          <div class="col-6">
+            <label>Optionen</label>
+            <div class="row">
+              <label class="pill" style="cursor:pointer;">
+                <input id="removeFillers" type="checkbox" checked style="transform:translateY(1px);" />
+                Füllwörter entfernen
+              </label>
+              <label class="pill" style="cursor:pointer;">
+                <input id="showExpectedOnFail" type="checkbox" style="transform:translateY(1px);" />
+                Bei Fehler „Richtig wäre …“ zeigen
+              </label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="divider"></div>
+            <div class="row">
+              <button id="btnStart" class="btn primary">Start (20 Aufgaben)</button>
+            </div>
+            <div class="footerNote">
+              Font-Hinweis: Lege die Basisschrift-Dateien ins Repo (z.B. /fonts) und passe die Dateinamen in @font-face an.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screenQuiz" class="card hidden">
+      <div class="section">
+        <div class="row" style="justify-content:space-between;">
+          <span class="pill">📌 <b id="progressText">Aufgabe 1 von 20</b></span>
+          <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
+        </div>
+
+        <div id="targetBox" class="bigTarget">…</div>
+
+        <div class="row">
+          <button id="btnMic" class="btn ok">🎤 Sprechen</button>
+          <button id="btnCheck" class="btn primary">Überprüfen</button>
+          <button id="btnNext" class="btn ghost" disabled>Nächste</button>
+          <span class="pill">Stille-Stop: <b id="silenceInfo">an</b></span>
+        </div>
+
+        <div id="fallbackWrap" class="grid hidden">
+          <div class="col-12">
+            <div class="feedback bad">SpeechRecognition ist nicht verfügbar. Bitte Text manuell eingeben.</div>
+          </div>
+          <div class="col-12">
+            <label for="fallbackInput">Eingabe (Fallback)</label>
+            <input id="fallbackInput" type="text" placeholder="Gelesenen Text eingeben…" />
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-6">
+            <label>Rohtext (1:1)</label>
+            <div id="rawText" class="mono"></div>
+          </div>
+          <div class="col-6">
+            <label>Normalisiert</label>
+            <div id="normText" class="mono"></div>
+          </div>
+          <div class="col-12">
+            <div id="feedback" class="feedback">Bereit.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screenResult" class="card hidden">
+      <div class="section">
+        <div class="row" style="justify-content:space-between;">
+          <span class="pill">🏁 <b>Ergebnis</b></span>
+          <span class="pill">20 Aufgaben</span>
+        </div>
+
+        <div class="kpi">
+          <div class="box">
+            <div class="muted">Richtig</div>
+            <div id="resRight" class="num">0</div>
+          </div>
+          <div class="box">
+            <div class="muted">Falsch</div>
+            <div id="resWrong" class="num">0</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button id="btnDone" class="btn primary">Fertig</button>
+          <button id="btnPractice" class="btn ghost">Weiter üben</button>
+        </div>
+
+        <div class="footerNote">
+          „Fertig“ sendet an LearningView: <span class="mono" style="display:inline-block; padding:3px 8px;">window.parent.postMessage("AppSolved","*")</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    "use strict";
+
+    const TASKS_TOTAL = 20;
+    const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
+    const AUDIO_OK_FILE = "correct.wav";
+    const AUDIO_BAD_FILE = "error.wav";
+    const SILENCE_MS = 900;
+
+    const WORDS_EASY = [
+      "Mama","Papa","Oma","Opa","Bett","Ball","Auto","Haus","Hund","Katze",
+      "Baum","Buch","Kind","Hand","Mund","Nase","Sonne","Mond","Weg","Tor",
+      "See","Brot","Käse","Wasser","Saft","Apfel","Birne","Tisch","Stuhl","Schule"
+    ];
+
+    const WORDS_HARD = [
+      "Fenster","Schmetterling","Regenbogen","Abenteuer","Schneeflocke","Fahrrad","Zahnbürste","Feuerwehr","Gummistiefel","Wintermantel",
+      "Eichhörnchen","Zirkusclown","Taschenlampe","Drachenflieger","Blumenwiese","Wasserflasche","Schulzimmer","Turnhalle","Spaziergang","Lieblingsbuch",
+      "Trommelwirbel","Bilderrahmen","Klingelton","Bauernhof","Schnürsenkel","Kastanienbaum","Pausenplatz","Himmelblau","Sternschnuppe","Sommerferien"
+    ];
+
+    const SENTENCES_EASY = [
+      "Ich sehe einen Hund.",
+      "Du bist da.",
+      "Mama hat Zeit.",
+      "Papa ist nett.",
+      "Die Sonne ist warm.",
+      "Der Ball ist rot.",
+      "Das Kind lacht.",
+      "Ich esse Brot.",
+      "Wir trinken Wasser.",
+      "Oma liest ein Buch.",
+      "Opa kommt jetzt.",
+      "Die Katze schläft.",
+      "Der Vogel singt.",
+      "Ich gehe zur Schule.",
+      "Du rennst schnell.",
+      "Wir spielen draussen.",
+      "Ich male ein Haus.",
+      "Der Baum ist gross.",
+      "Das Baby weint.",
+      "Ich höre Musik.",
+      "Wir sind froh.",
+      "Der Zug fährt weg.",
+      "Die Tür ist zu.",
+      "Das Fenster ist offen.",
+      "Ich habe Hunger."
+    ];
+
+    const SENTENCES_HARD = [
+      "Ich laufe leise zum Tor.",
+      "Wir gehen zusammen nach Hause.",
+      "Der Hund läuft über den Weg.",
+      "Die Katze sitzt auf dem Stuhl.",
+      "Im See schwimmt ein Fisch.",
+      "Der Regen fällt ganz fein.",
+      "Heute backt Mama einen Kuchen.",
+      "Papa fährt mit dem Auto los.",
+      "Ich packe mein Buch in die Tasche.",
+      "Wir spielen im Hof mit dem Ball.",
+      "Der Wind pfeift um das Haus.",
+      "Ich sehe den Mond am Himmel.",
+      "Oma kocht Suppe für uns alle.",
+      "Opa erzählt eine gute Geschichte.",
+      "Das Kind springt über einen Stein.",
+      "Der Vogel fliegt hoch hinauf.",
+      "Ich finde einen kleinen Schatz im Sand.",
+      "Wir bauen eine Burg aus Holz.",
+      "Die Sonne scheint durch das Fenster.",
+      "Ich höre ein leises Klopfen an der Tür.",
+      "Der Zug fährt schnell durch den Tunnel.",
+      "Wir räumen das Zimmer ganz auf.",
+      "Ich trage den Mantel im Winter gern.",
+      "Im Wald höre ich viele Tiere.",
+      "Am Abend putze ich meine Zähne."
+    ];
+
+    const el = (id)=>document.getElementById(id);
+
+    const screenStart = el("screenStart");
+    const screenQuiz = el("screenQuiz");
+    const screenResult = el("screenResult");
+
+    const modeSel = el("modeSel");
+    const diffSel = el("diffSel");
+    const orderSel = el("orderSel");
+    const langSel = el("langSel");
+    const audioBase = el("audioBase");
+    const removeFillers = el("removeFillers");
+    const showExpectedOnFail = el("showExpectedOnFail");
+
+    const btnStart = el("btnStart");
+
+    const progressText = el("progressText");
+    const targetBox = el("targetBox");
+    const btnMic = el("btnMic");
+    const btnCheck = el("btnCheck");
+    const btnNext = el("btnNext");
+    const rawText = el("rawText");
+    const normText = el("normText");
+    const feedback = el("feedback");
+    const rightCount = el("rightCount");
+    const wrongCount = el("wrongCount");
+
+    const fallbackWrap = el("fallbackWrap");
+    const fallbackInput = el("fallbackInput");
+
+    const resRight = el("resRight");
+    const resWrong = el("resWrong");
+    const btnDone = el("btnDone");
+    const btnPractice = el("btnPractice");
+
+    const srAvail = el("srAvail");
+    const silenceInfo = el("silenceInfo");
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasSR = !!SR;
+
+    srAvail.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
+
+    let recognition = null;
+    let isListening = false;
+
+    let speechBuffer = "";
+    let finalChunks = [];
+    let silenceTimer = null;
+    let hadFinalChunk = false;
+
+    function setupRecognition(){
+      if(!hasSR) return;
+      recognition = new SR();
+      recognition.lang = langSel.value || "de-CH";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 8;
+
+      recognition.onresult = (event)=>{
+        for(let i = event.resultIndex; i < event.results.length; i++){
+          const res = event.results[i];
+          const alt0 = res && res[0] ? (res[0].transcript || "") : "";
+          const transcript = alt0.trim();
+
+          if(res.isFinal){
+            if(transcript){
+              const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
+              if(transcript !== last){
+                finalChunks.push(transcript);
+                if(finalChunks.length > 40) finalChunks = finalChunks.slice(-40);
+                if(speechBuffer) speechBuffer += " ";
+                speechBuffer += transcript;
+                hadFinalChunk = true;
+              }
+            }
+          }
+
+          let interim = "";
+          if(!res.isFinal && transcript){
+            interim = transcript;
+          }
+          const combined = (speechBuffer + (interim ? (" " + interim) : "")).trim();
+          rawText.textContent = combined || "—";
+          normText.textContent = normalizeText(combined, {removeFillers: removeFillers.checked}) || "—";
+        }
+        restartSilenceTimer();
+      };
+
+      recognition.onerror = ()=>{
+        setFeedback("Fehler bei der Spracherkennung.", "bad");
+        stopListening(true);
+      };
+
+      recognition.onend = ()=>{
+        isListening = false;
+        updateMicButton();
+        clearSilenceTimer();
+      };
+    }
+
+    function restartSilenceTimer(){
+      if(!hasSR) return;
+      clearSilenceTimer();
+      silenceTimer = setTimeout(()=>{
+        if(isListening && hadFinalChunk){
+          stopListening(false);
+        }
+      }, SILENCE_MS);
+    }
+
+    function clearSilenceTimer(){
+      if(silenceTimer){
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+    }
+
+    function startListening(){
+      if(!hasSR || !recognition) return;
+
+      speechBuffer = "";
+      finalChunks = [];
+      hadFinalChunk = false;
+      rawText.textContent = "—";
+      normText.textContent = "—";
+
+      recognition.lang = langSel.value || "de-CH";
+      try{
+        recognition.start();
+        isListening = true;
+        updateMicButton();
+        setFeedback("Sprich jetzt. (Stoppt nach kurzer Stille)", "");
+        restartSilenceTimer();
+      }catch(err){
+        setFeedback("Spracherkennung konnte nicht gestartet werden.", "bad");
+        isListening = false;
+        updateMicButton();
+      }
+    }
+
+    function stopListening(){
+      if(!hasSR || !recognition) return;
+      try{ recognition.stop(); }catch(_){}
+      isListening = false;
+      updateMicButton();
+      clearSilenceTimer();
+    }
+
+    function toggleListening(){
+      if(!hasSR) return;
+      if(!recognition) setupRecognition();
+      if(!audioOk || !audioBad) initAudio();
+      if(isListening) stopListening();
+      else startListening();
+    }
+
+    function updateMicButton(){
+      btnMic.textContent = isListening ? "⏹️ Stop" : "🎤 Sprechen";
+      btnMic.classList.toggle("bad", isListening);
+      btnMic.classList.toggle("ok", !isListening);
+    }
+
+    let audioOk = null;
+    let audioBad = null;
+
+    function getAudioBase(){
+      const base = (audioBase.value || "").trim();
+      if(!base) return "";
+      return base.endsWith("/") ? base : (base + "/");
+    }
+
+    function initAudio(){
+      const base = getAudioBase();
+      audioOk = new Audio(base + "correct.wav");
+      audioBad = new Audio(base + "error.wav");
+    }
+
+    function playOk(){
+      if(!audioOk) initAudio();
+      try{ audioOk.currentTime = 0; audioOk.play(); }catch(_){}
+    }
+    function playBad(){
+      if(!audioBad) initAudio();
+      try{ audioBad.currentTime = 0; audioBad.play(); }catch(_){}
+    }
+
+    function normalizeText(s, opts){
+      const remove = !!(opts && opts.removeFillers);
+      let t = (s || "").toLowerCase();
+      try{
+        t = t.replace(/[^\p{L}\p{N}\s]/gu, " ");
+      }catch(_){
+        t = t.replace(/[^a-z0-9äöüß\s]/gi, " ");
+      }
+      t = t.replace(/\s+/g, " ").trim();
+      if(remove){
+        const parts = t.split(" ").filter(Boolean).filter(w => !FILLERS.has(w));
+        t = parts.join(" ");
+      }
+      return t;
+    }
+
+    function tokenize(norm){
+      if(!norm) return [];
+      return norm.split(" ").filter(Boolean);
+    }
+
+    function escapeRegex(s){
+      return (s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function containsWholeWordToken(spokenNorm, targetNorm){
+      const w = targetNorm.trim();
+      if(!w) return false;
+      const re = new RegExp("(^|\\s)" + escapeRegex(w) + "($|\\s)");
+      return re.test(spokenNorm);
+    }
+
+    function isSubsequenceMatch(targetTokens, spokenTokens, threshold){
+      if(targetTokens.length === 0) return false;
+      let i = 0;
+      for(let j = 0; j < spokenTokens.length && i < targetTokens.length; j++){
+        if(spokenTokens[j] === targetTokens[i]) i++;
+      }
+      return (i / targetTokens.length) >= threshold;
+    }
+
+    function compareDeterministic(targetText, spokenText, mode){
+      const tNorm = normalizeText(targetText, {removeFillers: removeFillers.checked});
+      const sNorm = normalizeText(spokenText, {removeFillers: removeFillers.checked});
+
+      if(!tNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
+      if(!sNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
+
+      if(mode === "words"){
+        const tTokens = tokenize(tNorm);
+        if(tTokens.length === 1){
+          return {ok: containsWholeWordToken(sNorm, tNorm), spokenNorm:sNorm, targetNorm:tNorm};
+        }
+        return {ok: isSubsequenceMatch(tTokens, tokenize(sNorm), 1.0), spokenNorm:sNorm, targetNorm:tNorm};
+      }
+
+      const longerIsSpoken = sNorm.length >= tNorm.length;
+      if(longerIsSpoken && sNorm.includes(tNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
+      if(!longerIsSpoken && tNorm.includes(sNorm)) return {ok:true, spokenNorm:sNorm, targetNorm:tNorm};
+
+      return {ok: isSubsequenceMatch(tokenize(tNorm), tokenize(sNorm), 0.90), spokenNorm:sNorm, targetNorm:tNorm};
+    }
+
+    let run = null;
+
+    function buildPool(){
+      const mode = modeSel.value;
+      const diff = diffSel.value;
+      if(mode === "words"){
+        return (diff === "easy") ? WORDS_EASY.slice() : WORDS_HARD.slice();
+      }
+      return (diff === "easy") ? SENTENCES_EASY.slice() : SENTENCES_HARD.slice();
+    }
+
+    function shuffleInPlace(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startRun(){
+      const pool = buildPool();
+      const order = orderSel.value;
+      const items = pool.slice();
+      if(order === "random") shuffleInPlace(items);
+
+      run = {
+        mode: modeSel.value,
+        items,
+        index: 0,
+        right: 0,
+        wrong: 0,
+        checked: false,
+        lastTarget: ""
+      };
+
+      if(hasSR && !recognition) setupRecognition();
+      initAudio();
+
+      goQuiz();
+      loadTask();
+    }
+
+    function goStart(){
+      screenStart.classList.remove("hidden");
+      screenQuiz.classList.add("hidden");
+      screenResult.classList.add("hidden");
+      if(isListening) stopListening();
+    }
+    function goQuiz(){
+      screenStart.classList.add("hidden");
+      screenQuiz.classList.remove("hidden");
+      screenResult.classList.add("hidden");
+    }
+    function goResult(){
+      screenStart.classList.add("hidden");
+      screenQuiz.classList.add("hidden");
+      screenResult.classList.remove("hidden");
+      if(isListening) stopListening();
+      resRight.textContent = String(run ? run.right : 0);
+      resWrong.textContent = String(run ? run.wrong : 0);
+    }
+
+    function setFeedback(text, kind){
+      feedback.textContent = text;
+      feedback.classList.remove("ok","bad");
+      if(kind === "ok") feedback.classList.add("ok");
+      if(kind === "bad") feedback.classList.add("bad");
+    }
+
+    function updateCounts(){
+      rightCount.textContent = String(run ? run.right : 0);
+      wrongCount.textContent = String(run ? run.wrong : 0);
+    }
+
+    function loadTask(){
+      if(!run) return;
+      if(run.index >= TASKS_TOTAL){
+        goResult();
+        return;
+      }
+
+      const target = run.items[run.index];
+      run.lastTarget = target;
+
+      progressText.textContent = `Aufgabe ${run.index + 1} von ${TASKS_TOTAL}`;
+      targetBox.textContent = target;
+
+      rawText.textContent = "—";
+      normText.textContent = "—";
+      setFeedback("Bereit.", "");
+      run.checked = false;
+
+      speechBuffer = "";
+      finalChunks = [];
+      hadFinalChunk = false;
+
+      el("btnNext").disabled = true;
+
+      if(!hasSR){
+        fallbackWrap.classList.remove("hidden");
+        fallbackInput.value = "";
+      }else{
+        fallbackWrap.classList.add("hidden");
+      }
+
+      updateCounts();
+    }
+
+    function getCurrentSpokenRaw(){
+      if(!hasSR) return (fallbackInput.value || "").trim();
+      return (speechBuffer || "").trim();
+    }
+
+    function doCheck(){
+      if(!run) return;
+      if(isListening) stopListening();
+
+      const spokenRaw = getCurrentSpokenRaw();
+      const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
+
+      rawText.textContent = spokenRaw || "—";
+      normText.textContent = cmp.spokenNorm || "—";
+
+      if(cmp.ok){
+        run.right++;
+        setFeedback("Richtig ✅", "ok");
+        playOk();
+      }else{
+        run.wrong++;
+        const showExpected = !!showExpectedOnFail.checked;
+        const extra = showExpected ? `  Richtig wäre: ${run.lastTarget}` : "";
+        setFeedback("Falsch ❌" + extra, "bad");
+        playBad();
+      }
+
+      run.checked = true;
+      el("btnNext").disabled = false;
+      updateCounts();
+    }
+
+    function doNext(){
+      if(!run || !run.checked) return;
+      run.index++;
+      loadTask();
+    }
+
+    function doDone(){
+      try{ window.parent.postMessage("AppSolved","*"); }catch(_){}
+    }
+
+    btnStart.addEventListener("click", startRun);
+
+    el("btnMic").addEventListener("click", ()=>{
+      if(!hasSR){
+        setFeedback("SpeechRecognition ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
+        return;
+      }
+      toggleListening();
+    });
+
+    el("btnCheck").addEventListener("click", doCheck);
+    el("btnNext").addEventListener("click", doNext);
+
+    btnDone.addEventListener("click", doDone);
+    btnPractice.addEventListener("click", ()=>{
+      run = null;
+      goStart();
+    });
+
+    langSel.addEventListener("change", ()=>{
+      if(recognition) recognition.lang = langSel.value || "de-CH";
+    });
+
+    audioBase.addEventListener("change", ()=>{
+      audioOk = null;
+      audioBad = null;
+    });
+
+    silenceInfo.textContent = "an";
+    if(!hasSR) fallbackWrap.classList.remove("hidden");
+
+    goStart();
+    updateMicButton();
+    rawText.textContent = "—";
+    normText.textContent = "—";
+  })();
+  </script>
+</body>
+</html>
