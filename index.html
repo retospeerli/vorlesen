@@ -618,7 +618,7 @@
       "Sie grinste, obwohl sie nichts sagte.",
       "Wir duckten uns, bevor jemand kam.",
       "Der Wind pfiff, während wir weitergingen.",
-      "Ich rannte los, als alle starrten.",
+      "Ich rannte los, als alle schauten.",   <!-- ersetzt: starrten -->
       "Sie blieben ruhig, obwohl Chaos herrschte.",
       "Der Hund folgte uns, bis wir verschwanden.",
       "Wir hörten auf, als es still wurde.",
@@ -925,21 +925,55 @@
     }
 
     // =========================
+    // RISKY WORD FILTER (Homophone / häufige SR-Verwechslungen)
+    // =========================
+    const RISKY_WORDS = new Set([
+      "starren","starrten","starre",
+      "starten","startete","startet",
+      "mehr","meer",
+      "seit","seid",
+      "das","dass",
+      "wieder","wider",
+      "leere","lehre",
+      "wahr","war",
+      "wen","wenn",
+      "weg","weck",
+      "denn","wenn"
+    ]);
+
+    function isSafeItem(text){
+      const norm = normalizeText(text, { removeFillers: false });
+      if(!norm) return false;
+      const toks = tokenize(norm);
+      for(const w of toks){
+        if(RISKY_WORDS.has(w)) return false;
+      }
+      return true;
+    }
+
+    // =========================
     // Run state
     // =========================
     let run = null;
 
     function buildPool(){
+      let pool;
       if(uiMode === "words"){
-        if(uiLevel === "easy") return WORDS_LVL1.slice();
-        if(uiLevel === "med")  return WORDS_LVL2.slice();
-        return WORDS_LVL3.slice();
+        if(uiLevel === "easy") pool = WORDS_LVL1.slice();
+        else if(uiLevel === "med") pool = WORDS_LVL2.slice();
+        else pool = WORDS_LVL3.slice();
       }else{
-        if(uiLevel === "easy") return SENT_LVL1.slice();
-        if(uiLevel === "med")  return SENT_LVL2.slice();
-        return SENT_LVL3.slice();
+        if(uiLevel === "easy") pool = SENT_LVL1.slice();
+        else if(uiLevel === "med") pool = SENT_LVL2.slice();
+        else pool = SENT_LVL3.slice();
       }
+
+      // ✂️ harte Qualitätskontrolle: Verwechslungs-Fallen entfernen
+      pool = pool.filter(isSafeItem);
+
+      return pool;
     }
+
     function shuffleInPlace(arr){
       for(let i = arr.length - 1; i > 0; i--){
         const j = Math.floor(Math.random() * (i + 1));
