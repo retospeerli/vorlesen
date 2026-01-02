@@ -8,18 +8,18 @@
   <style>
     /* =========================
        FONT: Deutschschweizer Basisschrift
-       Lege die Dateien z.B. in ./fonts/ ab und passe die Pfade unten an:
-       - fonts/DeutschschweizerBasisschrift.otf
-       - fonts/DeutschschweizerBasisschrift.ttf
+       Passe Dateinamen/Pfade an dein Repo an:
+       - ./fonts/DeutschschweizerBasisschrift.otf
+       - ./fonts/DeutschschweizerBasisschrift.ttf
        ========================= */
     @font-face{
       font-family:"Deutschschweizer Basisschrift";
       src:
         url("./fonts/DeutschschweizerBasisschrift.ttf") format("truetype"),
         url("./fonts/DeutschschweizerBasisschrift.otf") format("opentype");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap;
+      font-weight:400;
+      font-style:normal;
+      font-display:swap;
     }
 
     :root{
@@ -72,7 +72,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.2px;
     }
     .badge{
@@ -107,11 +107,9 @@
       grid-template-columns: repeat(12, 1fr);
     }
     .col-6{grid-column: span 6;}
-    .col-4{grid-column: span 4;}
-    .col-8{grid-column: span 8;}
     .col-12{grid-column: span 12;}
     @media (max-width: 860px){
-      .col-6,.col-4,.col-8{grid-column: span 12;}
+      .col-6{grid-column: span 12;}
     }
     label{
       font-size:13px;
@@ -128,11 +126,9 @@
       border-radius:12px;
       padding:10px 12px;
       outline:none;
-      font-size:16px; /* etwas grösser für Kinder */
+      font-size:16px;
       font-family: inherit;
     }
-    textarea{min-height:92px; resize:vertical;}
-
     .btn{
       appearance:none;
       border:1px solid var(--border);
@@ -161,13 +157,8 @@
       background:linear-gradient(180deg, rgba(255,92,122,.22), rgba(255,92,122,.10));
       border-color:rgba(255,92,122,.40);
     }
-    .btn.ghost{
-      background:transparent;
-    }
-    .btn[disabled]{
-      opacity:.55;
-      cursor:not-allowed;
-    }
+    .btn.ghost{background:transparent;}
+    .btn[disabled]{opacity:.55; cursor:not-allowed;}
     .btn.big{
       padding:14px 16px;
       font-size:18px;
@@ -185,6 +176,7 @@
       color:var(--muted);
       font-size:13px;
     }
+
     .bigTarget{
       font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
@@ -196,17 +188,23 @@
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
       font-family: inherit;
     }
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:13px;
+    .spokenNormBig{
+      /* exactly same font settings as bigTarget */
+      font-size: clamp(30px, 4.6vw, 58px);
+      font-weight:900;
+      line-height:1.15;
+      letter-spacing:.2px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px dashed rgba(122,162,255,.55);
+      background:rgba(122,162,255,.08);
+      font-family: inherit;
+      color: var(--accent); /* blue */
+      min-height: 1.15em;
       white-space:pre-wrap;
       word-break:break-word;
-      background:rgba(0,0,0,.20);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px 12px;
-      color:#dbe6ff;
     }
+
     .muted{color:var(--muted);}
     .feedback{
       padding:12px 14px;
@@ -220,40 +218,25 @@
     .feedback.ok{border-color:rgba(57,217,138,.45); background:rgba(57,217,138,.12); color:#dfffea;}
     .feedback.bad{border-color:rgba(255,92,122,.45); background:rgba(255,92,122,.10); color:#ffe2e8;}
     .hidden{display:none !important;}
-    .divider{
-      height:1px;
-      background:var(--border);
-      margin:6px 0;
-    }
-    .footerNote{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
-    }
+    .divider{height:1px; background:var(--border); margin:6px 0;}
+    .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
 
-    /* Info button (blue round with white I) */
+    /* Info button */
     .infoBtn{
-      width:44px;
-      height:44px;
-      border-radius:999px;
+      width:44px;height:44px;border-radius:999px;
       border:1px solid rgba(122,162,255,.55);
       background:linear-gradient(180deg, rgba(122,162,255,.38), rgba(122,162,255,.18));
-      color:#ffffff;
-      font-weight:1000;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      user-select:none;
+      color:#fff;font-weight:1000;
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;user-select:none;
       box-shadow:0 10px 26px rgba(0,0,0,.30);
     }
     .infoBtn:active{transform:translateY(1px);}
     .infoBtn span{font-size:18px; line-height:1; transform:translateY(-1px);}
 
-    /* Drawer / modal for teacher options */
+    /* Teacher overlay */
     .overlay{
-      position:fixed;
-      inset:0;
+      position:fixed; inset:0;
       background:rgba(0,0,0,.55);
       display:none;
       align-items:flex-end;
@@ -272,24 +255,9 @@
       display:grid;
       gap:12px;
     }
-    .drawerHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .drawerTitle{
-      font-weight:1000;
-      letter-spacing:.2px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    .drawerTitle .mini{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-    }
+    .drawerHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .drawerTitle{font-weight:1000; letter-spacing:.2px; display:flex; align-items:center; gap:10px;}
+    .drawerTitle .mini{font-size:12px; color:var(--muted); font-weight:700;}
     .closeBtn{
       border:1px solid var(--border);
       background:rgba(0,0,0,.18);
@@ -298,30 +266,14 @@
       padding:10px 12px;
       cursor:pointer;
       font-weight:900;
+      font-family:inherit;
     }
 
-    /* Start screen layout tweaks */
-    .modeRow{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .modeRow .btn{
-      flex:1 1 220px;
-    }
-    .levelRow{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-    }
-    @media (max-width: 720px){
-      .levelRow{grid-template-columns: 1fr;}
-    }
-    .levelRow .btn{
-      width:100%;
-      justify-content:center;
-      text-align:center;
-    }
+    /* Start screen */
+    .modeRow{display:flex; gap:12px; flex-wrap:wrap;}
+    .modeRow .btn{flex:1 1 220px;}
+    .levelRow{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
+    @media (max-width: 720px){ .levelRow{grid-template-columns: 1fr;} }
     .selected{
       outline:2px solid rgba(122,162,255,.55);
       border-color:rgba(122,162,255,.65) !important;
@@ -342,15 +294,13 @@
       </div>
     </div>
 
-    <!-- START SCREEN (simplified for students) -->
+    <!-- START -->
     <div id="screenStart" class="card">
       <div class="section">
-        <div class="row" style="justify-content:space-between;">
-          <div class="muted" style="font-size:14px;font-weight:800;">Wähle aus:</div>
-        </div>
+        <div class="muted" style="font-size:14px;font-weight:900;">Wähle aus:</div>
 
         <div>
-          <div class="muted" style="margin-bottom:8px;font-weight:800;">Modus</div>
+          <div class="muted" style="margin-bottom:8px;font-weight:900;">Modus</div>
           <div class="modeRow">
             <button id="btnModeWords" class="btn big selected" type="button">Wörter</button>
             <button id="btnModeSent" class="btn big" type="button">Sätze</button>
@@ -358,11 +308,11 @@
         </div>
 
         <div>
-          <div class="muted" style="margin-bottom:8px;font-weight:800;">Schwierigkeit</div>
+          <div class="muted" style="margin-bottom:8px;font-weight:900;">Schwierigkeit</div>
           <div class="levelRow">
-            <button id="btnLvlEasy" class="btn big selected" type="button">einfach<br><span class="muted" style="font-weight:800;">1. Klasse</span></button>
-            <button id="btnLvlMed" class="btn big" type="button">mittel<br><span class="muted" style="font-weight:800;">2. Klasse</span></button>
-            <button id="btnLvlHard" class="btn big" type="button">schwierig<br><span class="muted" style="font-weight:800;">3. Klasse</span></button>
+            <button id="btnLvlEasy" class="btn big selected" type="button">einfach<br><span class="muted" style="font-weight:900;">1. Klasse</span></button>
+            <button id="btnLvlMed" class="btn big" type="button">mittel<br><span class="muted" style="font-weight:900;">2. Klasse</span></button>
+            <button id="btnLvlHard" class="btn big" type="button">schwierig<br><span class="muted" style="font-weight:900;">3. Klasse</span></button>
           </div>
         </div>
 
@@ -372,13 +322,11 @@
           <button id="btnStart" class="btn primary big">Start</button>
         </div>
 
-        <div class="footerNote">
-          Tipp: Drücke 🎤 Sprechen, lies laut vor, dann „Überprüfen“.
-        </div>
+        <div class="footerNote">Tipp: 🎤 Sprechen → laut lesen → Überprüfen.</div>
       </div>
     </div>
 
-    <!-- QUIZ SCREEN -->
+    <!-- QUIZ -->
     <div id="screenQuiz" class="card hidden">
       <div class="section">
         <div class="row" style="justify-content:space-between;">
@@ -387,6 +335,9 @@
         </div>
 
         <div id="targetBox" class="bigTarget">…</div>
+
+        <!-- Only normalized spoken text (big, same style, blue) -->
+        <div id="spokenNormBig" class="spokenNormBig"> </div>
 
         <div class="row">
           <button id="btnMic" class="btn ok big">🎤 Sprechen</button>
@@ -404,23 +355,13 @@
           </div>
         </div>
 
-        <div class="grid">
-          <div class="col-6">
-            <label>Rohtext (1:1)</label>
-            <div id="rawText" class="mono"></div>
-          </div>
-          <div class="col-6">
-            <label>Normalisiert</label>
-            <div id="normText" class="mono"></div>
-          </div>
-          <div class="col-12">
-            <div id="feedback" class="feedback">Bereit.</div>
-          </div>
+        <div class="col-12">
+          <div id="feedback" class="feedback">Bereit.</div>
         </div>
       </div>
     </div>
 
-    <!-- RESULT SCREEN -->
+    <!-- RESULT -->
     <div id="screenResult" class="card hidden">
       <div class="section">
         <div class="row" style="justify-content:space-between;">
@@ -440,7 +381,7 @@
       </div>
     </div>
 
-    <!-- TEACHER INFO / SETTINGS (hidden behind info button) -->
+    <!-- TEACHER INFO / SETTINGS -->
     <div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Info">
       <div class="drawer">
         <div class="drawerHeader">
@@ -461,21 +402,24 @@
           </div>
 
           <div class="col-6">
-            <label for="audioBase">Audio-Pfad (optional)</label>
-            <input id="audioBase" type="text" placeholder="z.B. ./audio/  (Default: Root)" />
-            <div class="footerNote">Audiofiles: correct.wav, error.wav</div>
+            <label>Audio-Pfad</label>
+            <div class="footerNote">
+              Fix: <span style="font-weight:900;">/audio/correct.wav</span>,
+              <span style="font-weight:900;">/audio/error.wav</span>,
+              <span style="font-weight:900;">/audio/gamewon.wav</span>
+            </div>
           </div>
 
           <div class="col-6">
-            <label for="removeFillers">Vergleich</label>
+            <label>Vergleich</label>
             <label class="pill" style="cursor:pointer; width:fit-content;">
               <input id="removeFillers" type="checkbox" checked style="transform:translateY(1px);" />
-              Füllwörter entfernen (äh/ähm/also/und/bitte/ja/genau)
+              Füllwörter entfernen
             </label>
           </div>
 
           <div class="col-6">
-            <label for="showExpectedOnFail">Feedback</label>
+            <label>Feedback</label>
             <label class="pill" style="cursor:pointer; width:fit-content;">
               <input id="showExpectedOnFail" type="checkbox" />
               Bei Fehler „Richtig wäre …“ anzeigen
@@ -484,14 +428,14 @@
 
           <div class="col-12">
             <div class="divider"></div>
-            <div class="row" style="justify-content:space-between; gap:12px;">
-              <div class="footerNote">
-                Spracherkennung ist fix auf <b>de-CH</b> gesetzt (Schweiz), damit keine „ß“-Schreibung erzwungen wird.
-              </div>
-              <div class="pill">🎙️ Status: <b id="srAvail">—</b></div>
+            <div class="footerNote">
+              Spracherkennung ist fix auf <b>de-CH</b> gesetzt. Normalisierung ersetzt zusätzlich deterministisch <b>ß → ss</b>.
             </div>
             <div class="footerNote">
-              LearningView Abschluss: <span class="mono" style="display:inline-block; padding:3px 8px;">window.parent.postMessage("AppSolved","*")</span>
+              LearningView Abschluss: <span style="font-weight:900;">window.parent.postMessage("AppSolved","*")</span>
+            </div>
+            <div class="footerNote">
+              SpeechRecognition: <b id="srAvail">—</b>
             </div>
           </div>
         </div>
@@ -507,19 +451,23 @@
     // =========================
     // Fixed SpeechRecognition language
     // =========================
-    const SR_LANG = "de-CH"; // Swiss German locale => tends to avoid "ß" spelling
+    const SR_LANG = "de-CH"; // Swiss German locale
 
     // =========================
     // Config
     // =========================
     const TASKS_TOTAL = 20;
     const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
-    const AUDIO_OK_FILE = "correct.wav";
-    const AUDIO_BAD_FILE = "error.wav";
+
+    // Audio fixed paths (per requirement)
+    const AUDIO_OK_URL   = "/audio/correct.wav";
+    const AUDIO_BAD_URL  = "/audio/error.wav";
+    const AUDIO_WON_URL  = "/audio/gamewon.wav";
+
     const SILENCE_MS = 900;
 
     // =========================
-    // Lists: Words (graded)
+    // Lists
     // =========================
     const WORDS_LVL1 = [
       "mama","papa","oma","opa","haus","hund","katze","ball","brot","wasser",
@@ -537,12 +485,6 @@
       "wasserflasche","blumenwiese","klingelton","bauernhof","himmelblau","pausenplatz","wintermantel","zirkusclown","schneemann","schokokuchen"
     ];
 
-    // =========================
-    // Lists: 50 short first-reader sentences
-    //  - LVL1: very short
-    //  - LVL2: short
-    //  - LVL3: a bit longer
-    // =========================
     const SENT_LVL1 = [
       "Ich sehe einen Hund.",
       "Du bist da.",
@@ -561,7 +503,6 @@
       "Du rennst schnell.",
       "Wir spielen draussen."
     ];
-
     const SENT_LVL2 = [
       "Ich male ein Haus.",
       "Der Baum ist gross.",
@@ -581,7 +522,6 @@
       "Ich sehe den Mond am Himmel.",
       "Das Kind springt über einen Stein."
     ];
-
     const SENT_LVL3 = [
       "Wir gehen zusammen nach Hause.",
       "Heute backt Mama einen Kuchen.",
@@ -622,11 +562,12 @@
 
     const progressText = el("progressText");
     const targetBox = el("targetBox");
+    const spokenNormBig = el("spokenNormBig");
+
     const btnMic = el("btnMic");
     const btnCheck = el("btnCheck");
     const btnNext = el("btnNext");
-    const rawText = el("rawText");
-    const normText = el("normText");
+
     const feedback = el("feedback");
     const rightCount = el("rightCount");
     const wrongCount = el("wrongCount");
@@ -642,22 +583,19 @@
     const srBadge = el("srBadge");
     const srAvail = el("srAvail");
 
-    // teacher overlay
     const overlay = el("overlay");
     const btnInfo = el("btnInfo");
     const btnCloseInfo = el("btnCloseInfo");
 
-    // teacher options
     const orderSel = el("orderSel");
-    const audioBase = el("audioBase");
     const removeFillers = el("removeFillers");
     const showExpectedOnFail = el("showExpectedOnFail");
 
     // =========================
-    // Student choices (simplified UI)
+    // Student UI state
     // =========================
-    let uiMode = "words";  // words | sentences
-    let uiLevel = "easy";  // easy | med | hard
+    let uiMode = "words";
+    let uiLevel = "easy";
 
     function setMode(mode){
       uiMode = mode;
@@ -671,7 +609,6 @@
       btnLvlHard.classList.toggle("selected", level === "hard");
     }
 
-    // defaults
     setMode("words");
     setLevel("easy");
 
@@ -680,6 +617,24 @@
     btnLvlEasy.addEventListener("click", ()=>setLevel("easy"));
     btnLvlMed.addEventListener("click", ()=>setLevel("med"));
     btnLvlHard.addEventListener("click", ()=>setLevel("hard"));
+
+    // =========================
+    // Audio (fixed paths)
+    // =========================
+    let audioOk = null, audioBad = null, audioWon = null;
+
+    function initAudio(){
+      audioOk  = new Audio(AUDIO_OK_URL);
+      audioBad = new Audio(AUDIO_BAD_URL);
+      audioWon = new Audio(AUDIO_WON_URL);
+    }
+    function play(a){
+      if(!a) return;
+      try{ a.currentTime = 0; a.play(); }catch(_){}
+    }
+    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
+    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
+    function playWon(){ if(!audioWon) initAudio(); play(audioWon); }
 
     // =========================
     // SpeechRecognition
@@ -693,7 +648,7 @@
     let recognition = null;
     let isListening = false;
 
-    // Buffer strategy
+    // Buffer strategy: final chunks only
     let speechBuffer = "";
     let finalChunks = [];
     let silenceTimer = null;
@@ -701,42 +656,40 @@
 
     function setupRecognition(){
       if(!hasSR) return;
+
       recognition = new SR();
-
-      // FIXED LANGUAGE
       recognition.lang = SR_LANG;
-
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 8;
 
       recognition.onresult = (event)=>{
+        // collect finals + show normalized (final+interim for display)
+        let interimText = "";
         for(let i = event.resultIndex; i < event.results.length; i++){
           const res = event.results[i];
-          const alt0 = res && res[0] ? (res[0].transcript || "") : "";
-          const transcript = alt0.trim();
+          const transcript = (res && res[0] ? res[0].transcript : "").trim();
+          if(!transcript) continue;
 
           if(res.isFinal){
-            if(transcript){
-              const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
-              if(transcript !== last){
-                finalChunks.push(transcript);
-                if(finalChunks.length > 40) finalChunks = finalChunks.slice(-40);
-                if(speechBuffer) speechBuffer += " ";
-                speechBuffer += transcript;
-                hadFinalChunk = true;
-              }
+            const last = finalChunks.length ? finalChunks[finalChunks.length-1] : "";
+            if(transcript !== last){
+              finalChunks.push(transcript);
+              if(finalChunks.length > 40) finalChunks = finalChunks.slice(-40);
+              if(speechBuffer) speechBuffer += " ";
+              speechBuffer += transcript;
+              hadFinalChunk = true;
             }
+          }else{
+            interimText = transcript; // keep latest interim only for display
           }
-
-          // UI shows final buffer + interim (without storing interim)
-          let interim = "";
-          if(!res.isFinal && transcript) interim = transcript;
-
-          const combined = (speechBuffer + (interim ? (" " + interim) : "")).trim();
-          rawText.textContent = combined || "—";
-          normText.textContent = normalizeText(combined, {removeFillers: removeFillers.checked}) || "—";
         }
+
+        const combined = (speechBuffer + (interimText ? (" " + interimText) : "")).trim();
+        // Show ONLY normalized spoken text, big and blue
+        const shown = normalizeText(combined, {removeFillers: removeFillers.checked});
+        spokenNormBig.textContent = shown || " ";
+
         restartSilenceTimer();
       };
 
@@ -771,13 +724,12 @@
     function startListening(){
       if(!hasSR || !recognition) return;
 
+      // reset buffers for task
       speechBuffer = "";
       finalChunks = [];
       hadFinalChunk = false;
-      rawText.textContent = "—";
-      normText.textContent = "—";
+      spokenNormBig.textContent = " ";
 
-      // ensure fixed language every time
       recognition.lang = SR_LANG;
 
       try{
@@ -804,7 +756,7 @@
     function toggleListening(){
       if(!hasSR) return;
       if(!recognition) setupRecognition();
-      if(!audioOk || !audioBad) initAudio();
+      if(!audioOk || !audioBad || !audioWon) initAudio(); // user interaction
       if(isListening) stopListening();
       else startListening();
     }
@@ -817,39 +769,12 @@
     }
 
     // =========================
-    // Audio
-    // =========================
-    let audioOk = null;
-    let audioBad = null;
-
-    function getAudioBase(){
-      const base = (audioBase.value || "").trim();
-      if(!base) return "";
-      return base.endsWith("/") ? base : (base + "/");
-    }
-
-    function initAudio(){
-      const base = getAudioBase();
-      audioOk = new Audio(base + AUDIO_OK_FILE);
-      audioBad = new Audio(base + AUDIO_BAD_FILE);
-    }
-    function playOk(){
-      if(!audioOk) initAudio();
-      try{ audioOk.currentTime = 0; audioOk.play(); }catch(_){}
-    }
-    function playBad(){
-      if(!audioBad) initAudio();
-      try{ audioBad.currentTime = 0; audioBad.play(); }catch(_){}
-    }
-
-    // =========================
     // Normalization & Matching
     // =========================
     function normalizeText(s, opts){
       const remove = !!(opts && opts.removeFillers);
       let t = (s || "").toLowerCase();
 
-      // remove punctuation -> spaces
       try{
         t = t.replace(/[^\p{L}\p{N}\s]/gu, " ");
       }catch(_){
@@ -858,8 +783,7 @@
 
       t = t.replace(/\s+/g, " ").trim();
 
-      // Swiss German: optionally map ß -> ss (defensive, in case API returns ß anyway)
-      // (Does not invent; it's a deterministic normalization rule.)
+      // Swiss normalization: ß -> ss (deterministic)
       t = t.replace(/ß/g, "ss");
 
       if(remove){
@@ -870,8 +794,7 @@
     }
 
     function tokenize(norm){
-      if(!norm) return [];
-      return norm.split(" ").filter(Boolean);
+      return (norm ? norm.split(" ").filter(Boolean) : []);
     }
     function escapeRegex(s){
       return (s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -891,9 +814,9 @@
       return (i / targetTokens.length) >= threshold;
     }
 
-    function compareDeterministic(targetText, spokenText, mode){
+    function compareDeterministic(targetText, spokenTextRaw, mode){
       const tNorm = normalizeText(targetText, {removeFillers: removeFillers.checked});
-      const sNorm = normalizeText(spokenText, {removeFillers: removeFillers.checked});
+      const sNorm = normalizeText(spokenTextRaw, {removeFillers: removeFillers.checked});
 
       if(!tNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
       if(!sNorm) return {ok:false, spokenNorm:sNorm, targetNorm:tNorm};
@@ -930,7 +853,6 @@
         return SENT_LVL3.slice();
       }
     }
-
     function shuffleInPlace(arr){
       for(let i = arr.length - 1; i > 0; i--){
         const j = Math.floor(Math.random() * (i + 1));
@@ -942,7 +864,6 @@
     function startRun(){
       const pool = buildPool();
       const items = pool.slice();
-
       if(orderSel.value === "random") shuffleInPlace(items);
 
       run = {
@@ -956,7 +877,9 @@
       };
 
       if(hasSR && !recognition) setupRecognition();
-      initAudio();
+      // init audio is intentionally deferred until first interaction,
+      // but starting also counts as interaction in many browsers. We'll init here safely:
+      if(!audioOk || !audioBad || !audioWon) initAudio();
 
       goQuiz();
       loadTask();
@@ -981,6 +904,11 @@
 
       resRight.textContent = String(run ? run.right : 0);
       resWrong.textContent = String(run ? run.wrong : 0);
+
+      // Play gamewon.wav ONLY if all 20 correct and user already interacted (audio initialized)
+      if(run && run.right === TASKS_TOTAL && run.wrong === 0){
+        playWon();
+      }
     }
 
     function setFeedback(text, kind){
@@ -1002,14 +930,12 @@
         return;
       }
 
-      const target = run.items[run.index];
-      run.lastTarget = target;
+      run.lastTarget = run.items[run.index];
 
       progressText.textContent = `Aufgabe ${run.index + 1} von ${TASKS_TOTAL}`;
-      targetBox.textContent = target;
+      targetBox.textContent = run.lastTarget;
 
-      rawText.textContent = "—";
-      normText.textContent = "—";
+      spokenNormBig.textContent = " ";
       setFeedback("Bereit.", "");
       run.checked = false;
 
@@ -1029,20 +955,27 @@
       updateCounts();
     }
 
-    function getCurrentSpokenRaw(){
-      if(!hasSR) return (fallbackInput.value || "").trim();
+    function getSpokenRawForCheck(){
+      if(!hasSR){
+        return (fallbackInput.value || "").trim();
+      }
+      // Use ONLY final buffer for checking (deterministic)
       return (speechBuffer || "").trim();
     }
 
     function doCheck(){
       if(!run) return;
+
+      // user interaction => audio allowed
+      if(!audioOk || !audioBad || !audioWon) initAudio();
+
       if(isListening) stopListening();
 
-      const spokenRaw = getCurrentSpokenRaw();
+      const spokenRaw = getSpokenRawForCheck();
       const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
 
-      rawText.textContent = spokenRaw || "—";
-      normText.textContent = cmp.spokenNorm || "—";
+      // show only normalized spoken (already blue big display)
+      spokenNormBig.textContent = cmp.spokenNorm || " ";
 
       if(cmp.ok){
         run.right++;
@@ -1050,8 +983,7 @@
         playOk();
       }else{
         run.wrong++;
-        const showExpected = !!showExpectedOnFail.checked;
-        const extra = showExpected ? `  Richtig wäre: ${run.lastTarget}` : "";
+        const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
         setFeedback("Falsch ❌" + extra, "bad");
         playBad();
       }
@@ -1072,19 +1004,15 @@
     }
 
     // =========================
-    // Teacher info drawer
+    // Teacher drawer
     // =========================
     function openInfo(){ overlay.classList.add("open"); }
     function closeInfo(){ overlay.classList.remove("open"); }
 
     btnInfo.addEventListener("click", openInfo);
     btnCloseInfo.addEventListener("click", closeInfo);
-    overlay.addEventListener("click", (e)=>{
-      if(e.target === overlay) closeInfo();
-    });
-    window.addEventListener("keydown", (e)=>{
-      if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo();
-    });
+    overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
+    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
 
     // =========================
     // Buttons
@@ -1108,17 +1036,11 @@
       goStart();
     });
 
-    audioBase.addEventListener("change", ()=>{
-      audioOk = null;
-      audioBad = null;
-    });
-
     // Init
     if(!hasSR) fallbackWrap.classList.remove("hidden");
     goStart();
     updateMicButton();
-    rawText.textContent = "—";
-    normText.textContent = "—";
+    spokenNormBig.textContent = " ";
   })();
   </script>
 </body>
