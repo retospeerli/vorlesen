@@ -46,22 +46,9 @@
       padding:18px;
       box-sizing:border-box;
     }
+
     .app{width:min(1100px, 100%); display:grid; gap:14px;}
-    .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:12px 14px;
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:var(--shadow);
-    }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px;}
-    .badge{
-      font-size:12px; padding:3px 8px; border-radius:999px;
-      border:1px solid var(--border);
-      color:var(--muted);
-      background:rgba(0,0,0,.18);
-    }
+
     .card{
       border:1px solid var(--border);
       border-radius:var(--radius);
@@ -70,11 +57,10 @@
       overflow:hidden;
     }
     .section{padding:16px; display:grid; gap:14px;}
+
     .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
-    .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr);}
-    .col-6{grid-column: span 6;}
-    .col-12{grid-column: span 12;}
-    @media (max-width: 860px){ .col-6{grid-column: span 12;} }
+    .row.nowrap{flex-wrap:nowrap;}
+    .spacer{flex:1;}
 
     .btn{
       appearance:none;
@@ -115,55 +101,10 @@
       background:rgba(0,0,0,.16);
       color:var(--muted);
       font-size:13px;
+      white-space:nowrap;
     }
 
-    /* ✅ volle Breite + UMBRUCH ERLAUBT (keine Ein-Zeilen-Quetsche) */
-    .textBox{
-      width:100%;
-      box-sizing:border-box;
-      display:block;
-      font-size: clamp(30px, 4.6vw, 58px);
-      font-weight:900;
-      line-height:1.15;
-      letter-spacing:.2px;
-      padding:14px 16px;
-      border-radius:16px;
-      font-family: inherit;
-
-      white-space:normal;     /* ✅ Umbruch erlaubt */
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-
-    .bigTarget{
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
-      color:var(--text);
-    }
-
-    .spokenNormBig{
-      border:1px dashed rgba(122,162,255,.55);
-      background:rgba(122,162,255,.08);
-      color:var(--accent);
-      min-height: 1.15em;
-    }
-
-    .feedback{
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:rgba(0,0,0,.16);
-      font-weight:900;
-      letter-spacing:.2px;
-      font-size:16px;
-    }
-    .feedback.ok{border-color:rgba(57,217,138,.45); background:rgba(57,217,138,.12); color:#dfffea;}
-    .feedback.bad{border-color:rgba(255,92,122,.45); background:rgba(255,92,122,.10); color:#ffe2e8;}
-    .hidden{display:none !important;}
-    .divider{height:1px; background:var(--border); margin:6px 0;}
-    .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
-    .muted{color:var(--muted);}
-
+    /* Info button */
     .infoBtn{
       width:44px;height:44px;border-radius:999px;
       border:1px solid rgba(122,162,255,.55);
@@ -172,10 +113,65 @@
       display:inline-flex;align-items:center;justify-content:center;
       cursor:pointer;user-select:none;
       box-shadow:0 10px 26px rgba(0,0,0,.30);
+      flex:0 0 auto;
     }
     .infoBtn:active{transform:translateY(1px);}
     .infoBtn span{font-size:18px; line-height:1; transform:translateY(-1px);}
 
+    /* START screen controls */
+    .modeRow{display:flex; gap:12px; flex-wrap:wrap;}
+    .modeRow .btn{flex:1 1 220px;}
+    .levelRow{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
+    @media (max-width: 720px){ .levelRow{grid-template-columns: 1fr;} }
+    .selected{
+      outline:2px solid rgba(122,162,255,.55);
+      border-color:rgba(122,162,255,.65) !important;
+      background:linear-gradient(180deg, rgba(122,162,255,.32), rgba(122,162,255,.16)) !important;
+    }
+    .divider{height:1px; background:var(--border); margin:6px 0;}
+    .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
+    .muted{color:var(--muted);}
+
+    /* ✅ QUIZ: exakt 4 Zeilen */
+    .quizGrid{
+      display:grid;
+      gap:12px;
+      grid-template-rows: auto auto auto auto;
+    }
+
+    /* Zeile 2 / 3: volle Breite, eigene Zeile */
+    .taskLine, .spokenLine{
+      width:100%;
+      box-sizing:border-box;
+      display:block;
+      padding:14px 16px;
+      border-radius:16px;
+      font-family: inherit;
+      font-weight:900;
+      letter-spacing:.2px;
+      line-height:1.15;
+      font-size: clamp(30px, 4.6vw, 58px);
+
+      /* NICHT quetschen: Umbruch erlaubt */
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .taskLine{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
+      color:var(--text);
+    }
+
+    .spokenLine{
+      border:1px dashed rgba(122,162,255,.55);
+      background:rgba(122,162,255,.08);
+      color:var(--accent);
+      min-height:1.15em;
+    }
+
+    /* Overlay */
     .overlay{
       position:fixed; inset:0;
       background:rgba(0,0,0,.55);
@@ -210,29 +206,30 @@
       font-family:inherit;
     }
 
-    .modeRow{display:flex; gap:12px; flex-wrap:wrap;}
-    .modeRow .btn{flex:1 1 220px;}
-    .levelRow{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
-    @media (max-width: 720px){ .levelRow{grid-template-columns: 1fr;} }
-    .selected{
-      outline:2px solid rgba(122,162,255,.55);
-      border-color:rgba(122,162,255,.65) !important;
-      background:linear-gradient(180deg, rgba(122,162,255,.32), rgba(122,162,255,.16)) !important;
+    label{display:block; font-weight:900; color:var(--muted); margin-bottom:6px;}
+    select, input[type="text"]{
+      width:100%;
+      box-sizing:border-box;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      font-family:inherit;
+      font-weight:800;
+      outline:none;
     }
+
+    .grid{display:grid; gap:12px; grid-template-columns: repeat(12, 1fr);}
+    .col-6{grid-column: span 6;}
+    .col-12{grid-column: span 12;}
+    @media (max-width: 860px){ .col-6{grid-column: span 12;} }
+
+    .hidden{display:none !important;}
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <span>📖 Vorlese-App</span>
-        <span class="badge">20 Aufgaben</span>
-      </div>
-      <div class="row" style="gap:12px;">
-        <span class="badge" id="srBadge">🎙️ …</span>
-        <button id="btnInfo" class="infoBtn" aria-label="Info"><span>I</span></button>
-      </div>
-    </div>
 
     <!-- START -->
     <div id="screenStart" class="card">
@@ -268,37 +265,42 @@
 
     <!-- QUIZ -->
     <div id="screenQuiz" class="card hidden">
-      <div class="section">
-        <div class="row" style="justify-content:space-between;">
+      <div class="section quizGrid">
+
+        <!-- ✅ ZEILE 1 -->
+        <div class="row nowrap" style="gap:10px;">
+          <span class="pill"><b>📖 Vorlese-App</b></span>
           <span class="pill">📌 <b id="progressText">Aufgabe 1 von 20</b></span>
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
+          <span class="spacer"></span>
+          <span class="pill" id="srBadge">🎙️ …</span>
+          <button id="btnInfo" class="infoBtn" aria-label="Info"><span>I</span></button>
         </div>
 
-        <!-- ✅ Aufgabe: volle Breite, Umbruch erlaubt -->
-        <div id="targetBox" class="textBox bigTarget">…</div>
+        <!-- ✅ ZEILE 2 -->
+        <div id="targetBox" class="taskLine">…</div>
 
-        <!-- ✅ Erkannter Text: volle Breite, Umbruch erlaubt -->
-        <div id="spokenNormBig" class="textBox spokenNormBig"> </div>
+        <!-- ✅ ZEILE 3 -->
+        <div id="spokenNormBig" class="spokenLine"> </div>
 
-        <!-- Buttons darunter -->
+        <!-- ✅ ZEILE 4 -->
         <div class="row">
           <button id="btnMic" class="btn ok big">🎤 Sprechen</button>
           <button id="btnCheck" class="btn primary big">Überprüfen</button>
           <button id="btnNext" class="btn ghost big" disabled>Nächste</button>
         </div>
 
+        <!-- Fallback (nur wenn SR nicht verfügbar; liegt unter den 4 Zeilen, wird aber nur angezeigt dann) -->
         <div id="fallbackWrap" class="grid hidden">
           <div class="col-12">
-            <div class="feedback bad">Spracherkennung ist nicht verfügbar. Bitte Text eingeben.</div>
+            <div class="pill" style="border-color:rgba(255,92,122,.45); color:#ffe2e8;">
+              Spracherkennung ist nicht verfügbar. Bitte Text eingeben.
+            </div>
           </div>
           <div class="col-12">
             <label for="fallbackInput">Eingabe</label>
             <input id="fallbackInput" type="text" placeholder="Gelesenen Text eingeben…" />
           </div>
-        </div>
-
-        <div class="col-12">
-          <div id="feedback" class="feedback">Bereit.</div>
         </div>
       </div>
     </div>
@@ -393,56 +395,12 @@
     const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
     const SILENCE_MS = 900;
 
-    // ✅ Audio (relativ)
+    // ✅ Audio in ./audio/
     const AUDIO_OK_URL  = "./audio/correct.wav";
     const AUDIO_BAD_URL = "./audio/error.wav";
 
-    let audioOk = null, audioBad = null;
-    let audioArmed = false;
-
-    function initAudio(){
-      if(audioOk && audioBad) return;
-      audioOk  = new Audio(AUDIO_OK_URL);
-      audioBad = new Audio(AUDIO_BAD_URL);
-      audioOk.preload = "auto";
-      audioBad.preload = "auto";
-    }
-
-    function armAudio(){
-      if(audioArmed) return;
-      initAudio();
-
-      const unlock = (a)=>{
-        try{
-          a.muted = true;
-          a.currentTime = 0;
-          const p = a.play();
-          if(p && typeof p.then === "function"){
-            p.then(()=>{ a.pause(); a.currentTime = 0; a.muted = false; }).catch(()=>{ a.muted = false; });
-          }else{
-            a.pause(); a.currentTime = 0; a.muted = false;
-          }
-        }catch(_){}
-      };
-
-      unlock(audioOk);
-      unlock(audioBad);
-      audioArmed = true;
-    }
-
-    function play(a){
-      if(!a) return;
-      try{
-        a.pause();
-        a.currentTime = 0;
-        a.play();
-      }catch(_){}
-    }
-    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
-    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
-
     // =========================
-    // LISTS
+    // WORD LISTS
     // =========================
     const WORDS_LVL1 = [
       "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
@@ -582,7 +540,6 @@
     const btnCheck = el("btnCheck");
     const btnNext = el("btnNext");
 
-    const feedback = el("feedback");
     const rightCount = el("rightCount");
     const wrongCount = el("wrongCount");
 
@@ -595,8 +552,7 @@
     const btnPractice = el("btnPractice");
 
     const srBadge = el("srBadge");
-    const srAvail = el("srAvail");
-
+    const srAvail = el("srAvail"); // inside overlay
     const overlay = el("overlay");
     const btnInfo = el("btnInfo");
     const btnCloseInfo = el("btnCloseInfo");
@@ -606,7 +562,54 @@
     const showExpectedOnFail = el("showExpectedOnFail");
 
     // =========================
-    // State
+    // Audio
+    // =========================
+    let audioOk = null, audioBad = null;
+    let audioArmed = false;
+
+    function initAudio(){
+      if(audioOk && audioBad) return;
+      audioOk  = new Audio(AUDIO_OK_URL);
+      audioBad = new Audio(AUDIO_BAD_URL);
+      audioOk.preload = "auto";
+      audioBad.preload = "auto";
+    }
+
+    function armAudio(){
+      if(audioArmed) return;
+      initAudio();
+
+      const unlock = (a)=>{
+        try{
+          a.muted = true;
+          a.currentTime = 0;
+          const p = a.play();
+          if(p && typeof p.then === "function"){
+            p.then(()=>{ a.pause(); a.currentTime = 0; a.muted = false; }).catch(()=>{ a.muted = false; });
+          }else{
+            a.pause(); a.currentTime = 0; a.muted = false;
+          }
+        }catch(_){}
+      };
+
+      unlock(audioOk);
+      unlock(audioBad);
+      audioArmed = true;
+    }
+
+    function play(a){
+      if(!a) return;
+      try{
+        a.pause();
+        a.currentTime = 0;
+        a.play();
+      }catch(_){}
+    }
+    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
+    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
+
+    // =========================
+    // UI state (start)
     // =========================
     let uiMode = "words";
     let uiLevel = "easy";
@@ -638,8 +641,8 @@
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const hasSR = !!SR;
 
+    // srAvail label exists only inside overlay; set later when overlay opens
     srBadge.textContent = hasSR ? "🎙️ bereit" : "🎙️ nicht verfügbar";
-    srAvail.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
 
     let recognition = null;
     let isListening = false;
@@ -687,7 +690,7 @@
       };
 
       recognition.onerror = ()=>{
-        setFeedback("Fehler bei der Spracherkennung.", "bad");
+        srBadge.textContent = "🎙️ Fehler";
         stopListening(true);
       };
 
@@ -720,7 +723,6 @@
       speechBuffer = "";
       finalChunks = [];
       hadFinalChunk = false;
-
       spokenNormBig.textContent = " ";
 
       recognition.lang = SR_LANG;
@@ -729,12 +731,11 @@
         recognition.start();
         isListening = true;
         updateMicButton();
-        setFeedback("Sprich jetzt.", "");
         restartSilenceTimer();
       }catch(_){
-        setFeedback("Spracherkennung konnte nicht gestartet werden.", "bad");
         isListening = false;
         updateMicButton();
+        srBadge.textContent = "🎙️ Startfehler";
       }
     }
 
@@ -870,8 +871,7 @@
         else if(uiLevel === "med") pool = SENT_LVL2.slice();
         else pool = SENT_LVL3.slice();
       }
-      pool = pool.filter(isSafeItem);
-      return pool;
+      return pool.filter(isSafeItem);
     }
 
     function shuffleInPlace(arr){
@@ -925,13 +925,6 @@
       resWrong.textContent = String(run ? run.wrong : 0);
     }
 
-    function setFeedback(text, kind){
-      feedback.textContent = text;
-      feedback.classList.remove("ok","bad");
-      if(kind === "ok") feedback.classList.add("ok");
-      if(kind === "bad") feedback.classList.add("bad");
-    }
-
     function updateCounts(){
       rightCount.textContent = String(run ? run.right : 0);
       wrongCount.textContent = String(run ? run.wrong : 0);
@@ -950,7 +943,6 @@
       targetBox.textContent = run.lastTarget;
 
       spokenNormBig.textContent = " ";
-      setFeedback("Bereit.", "");
       run.checked = false;
 
       speechBuffer = "";
@@ -967,6 +959,7 @@
       }
 
       updateCounts();
+      updateMicButton();
     }
 
     function getSpokenRawForCheck(){
@@ -977,7 +970,6 @@
     function doCheck(){
       if(!run) return;
       armAudio();
-
       if(isListening) stopListening();
 
       const spokenRaw = getSpokenRawForCheck();
@@ -987,13 +979,17 @@
 
       if(cmp.ok){
         run.right++;
-        setFeedback("Richtig ✅", "ok");
-        playOk();   // ✅ correct.wav
+        srBadge.textContent = "✅ richtig";
+        playOk();
       }else{
         run.wrong++;
-        const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
-        setFeedback("Falsch ❌" + extra, "bad");
-        playBad();  // ✅ error.wav
+        srBadge.textContent = "❌ falsch";
+        playBad();
+
+        if(showExpectedOnFail.checked){
+          // optional: kurz den Soll-Text anzeigen (ohne extra Zeile: wir hängen ihn in SR-Badge)
+          srBadge.textContent = "❌ falsch – richtig: " + run.lastTarget;
+        }
       }
 
       run.checked = true;
@@ -1004,6 +1000,8 @@
     function doNext(){
       if(!run || !run.checked) return;
       run.index++;
+      // SR-Badge zurück
+      srBadge.textContent = hasSR ? "🎙️ bereit" : "🎙️ nicht verfügbar";
       loadTask();
     }
 
@@ -1011,8 +1009,14 @@
       try{ window.parent.postMessage("AppSolved","*"); }catch(_){}
     }
 
+    // =========================
     // Teacher drawer
-    function openInfo(){ overlay.classList.add("open"); }
+    // =========================
+    function openInfo(){
+      overlay.classList.add("open");
+      const availEl = document.getElementById("srAvail");
+      if(availEl) availEl.textContent = hasSR ? "verfügbar" : "nicht verfügbar";
+    }
     function closeInfo(){ overlay.classList.remove("open"); }
 
     btnInfo.addEventListener("click", ()=>{ armAudio(); openInfo(); });
@@ -1020,20 +1024,22 @@
     overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
     window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
 
+    // =========================
     // Buttons
+    // =========================
     btnStart.addEventListener("click", startRun);
 
     btnMic.addEventListener("click", ()=>{
       armAudio();
       if(!hasSR){
-        setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
+        srBadge.textContent = "🎙️ nicht verfügbar";
         return;
       }
       toggleListening();
     });
 
-    btnCheck.addEventListener("click", ()=>{ armAudio(); doCheck(); });
-    btnNext.addEventListener("click", ()=>{ armAudio(); doNext(); });
+    btnCheck.addEventListener("click", doCheck);
+    btnNext.addEventListener("click", doNext);
 
     btnDone.addEventListener("click", ()=>{ armAudio(); doDone(); });
     btnPractice.addEventListener("click", ()=>{
@@ -1049,7 +1055,7 @@
     // Init
     if(!hasSR) fallbackWrap.classList.remove("hidden");
     goStart();
-    spokenNormBig.textContent = " ";
+    updateMicButton();
   })();
   </script>
 </body>
