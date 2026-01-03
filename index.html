@@ -117,13 +117,12 @@
       font-size:13px;
     }
 
-    /* ✅ Aufgabe + erkannter Text: volle Breite, 1 Zeile, Auto-Fit via JS */
-    .lineBox{
+    /* ✅ volle Breite + UMBRUCH ERLAUBT (keine Ein-Zeilen-Quetsche) */
+    .textBox{
       width:100%;
       box-sizing:border-box;
       display:block;
-
-      font-size:58px;          /* Startwert – JS verkleinert bei Bedarf */
+      font-size: clamp(30px, 4.6vw, 58px);
       font-weight:900;
       line-height:1.15;
       letter-spacing:.2px;
@@ -131,9 +130,9 @@
       border-radius:16px;
       font-family: inherit;
 
-      white-space:nowrap;      /* immer 1 Zeile */
-      overflow:hidden;         /* falls JS noch fitten muss */
-      text-overflow:clip;      /* NICHT ellipsis */
+      white-space:normal;     /* ✅ Umbruch erlaubt */
+      overflow-wrap:anywhere;
+      word-break:break-word;
     }
 
     .bigTarget{
@@ -165,7 +164,6 @@
     .footerNote{font-size:12px; color:var(--muted); line-height:1.35;}
     .muted{color:var(--muted);}
 
-    /* Info button + overlay */
     .infoBtn{
       width:44px;height:44px;border-radius:999px;
       border:1px solid rgba(122,162,255,.55);
@@ -212,7 +210,6 @@
       font-family:inherit;
     }
 
-    /* Start screen */
     .modeRow{display:flex; gap:12px; flex-wrap:wrap;}
     .modeRow .btn{flex:1 1 220px;}
     .levelRow{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px;}
@@ -277,11 +274,11 @@
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
         </div>
 
-        <!-- ✅ volle Breite / eigene Zeile -->
-        <div id="targetBox" class="lineBox bigTarget">…</div>
+        <!-- ✅ Aufgabe: volle Breite, Umbruch erlaubt -->
+        <div id="targetBox" class="textBox bigTarget">…</div>
 
-        <!-- ✅ volle Breite / eigene Zeile darunter -->
-        <div id="spokenNormBig" class="lineBox spokenNormBig"> </div>
+        <!-- ✅ Erkannter Text: volle Breite, Umbruch erlaubt -->
+        <div id="spokenNormBig" class="textBox spokenNormBig"> </div>
 
         <!-- Buttons darunter -->
         <div class="row">
@@ -349,7 +346,7 @@
           <div class="col-6">
             <label>Audio</label>
             <div class="footerNote">
-              Fix: <b>/audio/correct.wav</b>, <b>/audio/error.wav</b>, <b>/audio/gamewon.wav</b>
+              Dateien: <b>./audio/correct.wav</b>, <b>./audio/error.wav</b>
             </div>
           </div>
 
@@ -394,54 +391,58 @@
     const SR_LANG = "de-CH";
     const TASKS_TOTAL = 20;
     const FILLERS = new Set(["äh","ähm","also","und","bitte","ja","genau"]);
-
-    const AUDIO_OK_URL  = "/audio/correct.wav";
-    const AUDIO_BAD_URL = "/audio/error.wav";
-    const AUDIO_WON_URL = "/audio/gamewon.wav";
     const SILENCE_MS = 900;
 
-    // ===== Auto-Fit: 1 Zeile, volle Breite, vollständig sichtbar =====
-    // (Startwert 58px, Minimum 22px – kannst du nach Bedarf anpassen)
-    const FIT_MAX_PX = 58;
-    const FIT_MIN_PX = 22;
+    // ✅ Audio (relativ)
+    const AUDIO_OK_URL  = "./audio/correct.wav";
+    const AUDIO_BAD_URL = "./audio/error.wav";
 
-    function fitSingleLine(el, maxPx = FIT_MAX_PX, minPx = FIT_MIN_PX){
-      if(!el) return;
-      // leere Inhalte nicht fitten
-      const txt = (el.textContent || "").trim();
-      if(!txt){
-        el.style.fontSize = maxPx + "px";
-        return;
-      }
+    let audioOk = null, audioBad = null;
+    let audioArmed = false;
 
-      // Reset auf max
-      el.style.fontSize = maxPx + "px";
-
-      // Wenn passt: fertig
-      if(el.scrollWidth <= el.clientWidth) return;
-
-      // Binary search zwischen min..max
-      let lo = minPx, hi = maxPx, best = minPx;
-      while(lo <= hi){
-        const mid = Math.floor((lo + hi) / 2);
-        el.style.fontSize = mid + "px";
-        if(el.scrollWidth <= el.clientWidth){
-          best = mid;
-          lo = mid + 1;
-        }else{
-          hi = mid - 1;
-        }
-      }
-      el.style.fontSize = best + "px";
+    function initAudio(){
+      if(audioOk && audioBad) return;
+      audioOk  = new Audio(AUDIO_OK_URL);
+      audioBad = new Audio(AUDIO_BAD_URL);
+      audioOk.preload = "auto";
+      audioBad.preload = "auto";
     }
 
-    function fitBoth(){
-      fitSingleLine(targetBox);
-      fitSingleLine(spokenNormBig);
+    function armAudio(){
+      if(audioArmed) return;
+      initAudio();
+
+      const unlock = (a)=>{
+        try{
+          a.muted = true;
+          a.currentTime = 0;
+          const p = a.play();
+          if(p && typeof p.then === "function"){
+            p.then(()=>{ a.pause(); a.currentTime = 0; a.muted = false; }).catch(()=>{ a.muted = false; });
+          }else{
+            a.pause(); a.currentTime = 0; a.muted = false;
+          }
+        }catch(_){}
+      };
+
+      unlock(audioOk);
+      unlock(audioBad);
+      audioArmed = true;
     }
+
+    function play(a){
+      if(!a) return;
+      try{
+        a.pause();
+        a.currentTime = 0;
+        a.play();
+      }catch(_){}
+    }
+    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
+    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
 
     // =========================
-    // WORD LISTS
+    // LISTS
     // =========================
     const WORDS_LVL1 = [
       "Hund","Katze","Maus","Frosch","Vogel","Fisch","Bär","Wolf","Haus","Wald",
@@ -605,7 +606,7 @@
     const showExpectedOnFail = el("showExpectedOnFail");
 
     // =========================
-    // Student UI state
+    // State
     // =========================
     let uiMode = "words";
     let uiLevel = "easy";
@@ -625,29 +626,11 @@
     setMode("words");
     setLevel("easy");
 
-    btnModeWords.addEventListener("click", ()=>setMode("words"));
-    btnModeSent.addEventListener("click", ()=>setMode("sentences"));
-    btnLvlEasy.addEventListener("click", ()=>setLevel("easy"));
-    btnLvlMed.addEventListener("click", ()=>setLevel("med"));
-    btnLvlHard.addEventListener("click", ()=>setLevel("hard"));
-
-    // =========================
-    // Audio
-    // =========================
-    let audioOk = null, audioBad = null, audioWon = null;
-
-    function initAudio(){
-      audioOk  = new Audio(AUDIO_OK_URL);
-      audioBad = new Audio(AUDIO_BAD_URL);
-      audioWon = new Audio(AUDIO_WON_URL);
-    }
-    function play(a){
-      if(!a) return;
-      try{ a.currentTime = 0; a.play(); }catch(_){}
-    }
-    function playOk(){ if(!audioOk) initAudio(); play(audioOk); }
-    function playBad(){ if(!audioBad) initAudio(); play(audioBad); }
-    function playWon(){ if(!audioWon) initAudio(); play(audioWon); }
+    btnModeWords.addEventListener("click", ()=>{ armAudio(); setMode("words"); });
+    btnModeSent.addEventListener("click", ()=>{ armAudio(); setMode("sentences"); });
+    btnLvlEasy.addEventListener("click", ()=>{ armAudio(); setLevel("easy"); });
+    btnLvlMed.addEventListener("click", ()=>{ armAudio(); setLevel("med"); });
+    btnLvlHard.addEventListener("click", ()=>{ armAudio(); setLevel("hard"); });
 
     // =========================
     // SpeechRecognition
@@ -700,9 +683,6 @@
         const shown = normalizeText(combined, {removeFillers: removeFillers.checked});
         spokenNormBig.textContent = shown || " ";
 
-        // ✅ immer fitten (1 Zeile, volle Breite)
-        fitBoth();
-
         restartSilenceTimer();
       };
 
@@ -742,7 +722,6 @@
       hadFinalChunk = false;
 
       spokenNormBig.textContent = " ";
-      fitBoth();
 
       recognition.lang = SR_LANG;
 
@@ -770,7 +749,7 @@
     function toggleListening(){
       if(!hasSR) return;
       if(!recognition) setupRecognition();
-      if(!audioOk || !audioBad || !audioWon) initAudio();
+      armAudio();
       if(isListening) stopListening();
       else startListening();
     }
@@ -849,7 +828,7 @@
     }
 
     // =========================
-    // RISKY WORD FILTER
+    // Risky word filter
     // =========================
     const RISKY_WORDS = new Set([
       "starren","starrten","starre",
@@ -904,6 +883,7 @@
     }
 
     function startRun(){
+      armAudio();
       const pool = buildPool();
       const items = pool.slice();
       if(orderSel.value === "random") shuffleInPlace(items);
@@ -919,7 +899,6 @@
       };
 
       if(hasSR && !recognition) setupRecognition();
-      if(!audioOk || !audioBad || !audioWon) initAudio();
 
       goQuiz();
       loadTask();
@@ -944,10 +923,6 @@
 
       resRight.textContent = String(run ? run.right : 0);
       resWrong.textContent = String(run ? run.wrong : 0);
-
-      if(run && run.right === TASKS_TOTAL && run.wrong === 0){
-        playWon();
-      }
     }
 
     function setFeedback(text, kind){
@@ -992,9 +967,6 @@
       }
 
       updateCounts();
-
-      // ✅ nach Textwechsel fitten
-      requestAnimationFrame(fitBoth);
     }
 
     function getSpokenRawForCheck(){
@@ -1004,7 +976,7 @@
 
     function doCheck(){
       if(!run) return;
-      if(!audioOk || !audioBad || !audioWon) initAudio();
+      armAudio();
 
       if(isListening) stopListening();
 
@@ -1012,17 +984,16 @@
       const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
 
       spokenNormBig.textContent = cmp.spokenNorm || " ";
-      requestAnimationFrame(fitBoth);
 
       if(cmp.ok){
         run.right++;
         setFeedback("Richtig ✅", "ok");
-        playOk();
+        playOk();   // ✅ correct.wav
       }else{
         run.wrong++;
         const extra = showExpectedOnFail.checked ? `  Richtig wäre: ${run.lastTarget}` : "";
         setFeedback("Falsch ❌" + extra, "bad");
-        playBad();
+        playBad();  // ✅ error.wav
       }
 
       run.checked = true;
@@ -1040,23 +1011,20 @@
       try{ window.parent.postMessage("AppSolved","*"); }catch(_){}
     }
 
-    // =========================
     // Teacher drawer
-    // =========================
     function openInfo(){ overlay.classList.add("open"); }
     function closeInfo(){ overlay.classList.remove("open"); }
 
-    btnInfo.addEventListener("click", openInfo);
-    btnCloseInfo.addEventListener("click", closeInfo);
+    btnInfo.addEventListener("click", ()=>{ armAudio(); openInfo(); });
+    btnCloseInfo.addEventListener("click", ()=>{ armAudio(); closeInfo(); });
     overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeInfo(); });
     window.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && overlay.classList.contains("open")) closeInfo(); });
 
-    // =========================
     // Buttons
-    // =========================
     btnStart.addEventListener("click", startRun);
 
     btnMic.addEventListener("click", ()=>{
+      armAudio();
       if(!hasSR){
         setFeedback("Spracherkennung ist nicht verfügbar. Nutze das Eingabefeld.", "bad");
         return;
@@ -1064,24 +1032,24 @@
       toggleListening();
     });
 
-    btnCheck.addEventListener("click", doCheck);
-    btnNext.addEventListener("click", doNext);
+    btnCheck.addEventListener("click", ()=>{ armAudio(); doCheck(); });
+    btnNext.addEventListener("click", ()=>{ armAudio(); doNext(); });
 
-    btnDone.addEventListener("click", doDone);
+    btnDone.addEventListener("click", ()=>{ armAudio(); doDone(); });
     btnPractice.addEventListener("click", ()=>{
+      armAudio();
       run = null;
       goStart();
     });
 
-    // ✅ bei Resize neu fitten (z.B. Vollbild / Tablet drehen)
-    window.addEventListener("resize", ()=>requestAnimationFrame(fitBoth));
+    // Arm audio on first interaction anywhere
+    window.addEventListener("pointerdown", armAudio, { once:true });
+    window.addEventListener("keydown", armAudio, { once:true });
 
     // Init
     if(!hasSR) fallbackWrap.classList.remove("hidden");
     goStart();
-    updateMicButton();
     spokenNormBig.textContent = " ";
-    requestAnimationFrame(fitBoth);
   })();
   </script>
 </body>
