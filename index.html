@@ -117,42 +117,36 @@
       font-size:13px;
     }
 
-    /* ✅ GANZE ZEILE, KEIN UMbruch */
-    .bigTarget{
-      font-size: clamp(30px, 4.6vw, 58px);
+    /* ✅ Aufgabe + erkannter Text: volle Breite, 1 Zeile, Auto-Fit via JS */
+    .lineBox{
+      width:100%;
+      box-sizing:border-box;
+      display:block;
+
+      font-size:58px;          /* Startwert – JS verkleinert bei Bedarf */
       font-weight:900;
       line-height:1.15;
       letter-spacing:.2px;
       padding:14px 16px;
       border-radius:16px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
       font-family: inherit;
 
-      /* wichtig: 1 Zeile */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space:nowrap;      /* immer 1 Zeile */
+      overflow:hidden;         /* falls JS noch fitten muss */
+      text-overflow:clip;      /* NICHT ellipsis */
     }
 
-    /* ✅ GANZE ZEILE UNTERHALB, KEIN Umbruch */
+    .bigTarget{
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.18));
+      color:var(--text);
+    }
+
     .spokenNormBig{
-      font-size: clamp(30px, 4.6vw, 58px);
-      font-weight:900;
-      line-height:1.15;
-      letter-spacing:.2px;
-      padding:14px 16px;
-      border-radius:16px;
       border:1px dashed rgba(122,162,255,.55);
       background:rgba(122,162,255,.08);
-      font-family: inherit;
-      color: var(--accent);
+      color:var(--accent);
       min-height: 1.15em;
-
-      /* wichtig: 1 Zeile */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .feedback{
@@ -283,9 +277,13 @@
           <span class="pill">✅ richtig: <b id="rightCount">0</b> • ❌ falsch: <b id="wrongCount">0</b></span>
         </div>
 
-        <div id="targetBox" class="bigTarget">…</div>
-        <div id="spokenNormBig" class="spokenNormBig"> </div>
+        <!-- ✅ volle Breite / eigene Zeile -->
+        <div id="targetBox" class="lineBox bigTarget">…</div>
 
+        <!-- ✅ volle Breite / eigene Zeile darunter -->
+        <div id="spokenNormBig" class="lineBox spokenNormBig"> </div>
+
+        <!-- Buttons darunter -->
         <div class="row">
           <button id="btnMic" class="btn ok big">🎤 Sprechen</button>
           <button id="btnCheck" class="btn primary big">Überprüfen</button>
@@ -401,6 +399,46 @@
     const AUDIO_BAD_URL = "/audio/error.wav";
     const AUDIO_WON_URL = "/audio/gamewon.wav";
     const SILENCE_MS = 900;
+
+    // ===== Auto-Fit: 1 Zeile, volle Breite, vollständig sichtbar =====
+    // (Startwert 58px, Minimum 22px – kannst du nach Bedarf anpassen)
+    const FIT_MAX_PX = 58;
+    const FIT_MIN_PX = 22;
+
+    function fitSingleLine(el, maxPx = FIT_MAX_PX, minPx = FIT_MIN_PX){
+      if(!el) return;
+      // leere Inhalte nicht fitten
+      const txt = (el.textContent || "").trim();
+      if(!txt){
+        el.style.fontSize = maxPx + "px";
+        return;
+      }
+
+      // Reset auf max
+      el.style.fontSize = maxPx + "px";
+
+      // Wenn passt: fertig
+      if(el.scrollWidth <= el.clientWidth) return;
+
+      // Binary search zwischen min..max
+      let lo = minPx, hi = maxPx, best = minPx;
+      while(lo <= hi){
+        const mid = Math.floor((lo + hi) / 2);
+        el.style.fontSize = mid + "px";
+        if(el.scrollWidth <= el.clientWidth){
+          best = mid;
+          lo = mid + 1;
+        }else{
+          hi = mid - 1;
+        }
+      }
+      el.style.fontSize = best + "px";
+    }
+
+    function fitBoth(){
+      fitSingleLine(targetBox);
+      fitSingleLine(spokenNormBig);
+    }
 
     // =========================
     // WORD LISTS
@@ -662,6 +700,9 @@
         const shown = normalizeText(combined, {removeFillers: removeFillers.checked});
         spokenNormBig.textContent = shown || " ";
 
+        // ✅ immer fitten (1 Zeile, volle Breite)
+        fitBoth();
+
         restartSilenceTimer();
       };
 
@@ -699,7 +740,9 @@
       speechBuffer = "";
       finalChunks = [];
       hadFinalChunk = false;
+
       spokenNormBig.textContent = " ";
+      fitBoth();
 
       recognition.lang = SR_LANG;
 
@@ -848,7 +891,6 @@
         else if(uiLevel === "med") pool = SENT_LVL2.slice();
         else pool = SENT_LVL3.slice();
       }
-
       pool = pool.filter(isSafeItem);
       return pool;
     }
@@ -950,6 +992,9 @@
       }
 
       updateCounts();
+
+      // ✅ nach Textwechsel fitten
+      requestAnimationFrame(fitBoth);
     }
 
     function getSpokenRawForCheck(){
@@ -967,6 +1012,7 @@
       const cmp = compareDeterministic(run.lastTarget, spokenRaw, run.mode);
 
       spokenNormBig.textContent = cmp.spokenNorm || " ";
+      requestAnimationFrame(fitBoth);
 
       if(cmp.ok){
         run.right++;
@@ -1027,11 +1073,15 @@
       goStart();
     });
 
+    // ✅ bei Resize neu fitten (z.B. Vollbild / Tablet drehen)
+    window.addEventListener("resize", ()=>requestAnimationFrame(fitBoth));
+
     // Init
     if(!hasSR) fallbackWrap.classList.remove("hidden");
     goStart();
     updateMicButton();
     spokenNormBig.textContent = " ";
+    requestAnimationFrame(fitBoth);
   })();
   </script>
 </body>
